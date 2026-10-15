@@ -251,7 +251,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
     <section class="section" id="first-exercise">
       <h2>先在一个小项目上试试 PEA</h2>
       <p class="section-intro">从本地目录开始：先看候选项，再生成一份不执行代码转换的规划结果，最后跑通整条证据流水线。</p>
-      <div class="callout"><strong>先下载可运行的离线原型：</strong>其中包含八个只读分析域、受控执行闭环（<code>pea protect</code>）、规划器、任务简报与战场反馈回路、证据账本、MCP 工具合同、示例请求与设计文档。解压后，在项目根目录运行下面的命令。<!-- 下载指向仓库根目录的发布包；文件名必须与 `make release-pkg` 生成的包名一致（pea-<版本>-release.zip），由 tests/test_landing_page.py 钉死。若改用 GitHub Release 附件，把 href 换成 https://github.com/haothtrteen/pea/releases/latest/download/pea-<版本>-release.zip 即可。 --><p style="margin:10px 0 0"><a class="link-button" href="https://github.com/haothtrteen/pea/raw/main/pea-0.7.0-release.zip">下载 PEA 0.7.0 发布包（zip）↓</a></p></div>
+      <div class="callout"><strong>先下载可运行的离线原型：</strong>其中包含八个只读分析域、受控执行闭环（<code>pea protect</code>）、规划器、任务简报与战场反馈回路、证据账本、MCP 工具合同、示例请求与设计文档。解压后，在项目根目录运行下面的命令。<!-- 下载指向仓库根目录的发布包；文件名必须与 `make release-pkg` 生成的包名一致（pea-<版本>-release.zip），由 tests/test_landing_page.py 钉死。若改用 GitHub Release 附件，把 href 换成 https://github.com/haothtrteen/pea/releases/latest/download/pea-<版本>-release.zip 即可。 --><p style="margin:10px 0 0"><a class="link-button" href="./raw/main/pea-0.7.0-release.zip">下载 PEA 0.7.0 发布包（zip）↓</a></p></div>
       <div class="prompt-label"><span>步骤 1 · 查看本地方案目录</span><button class="copy-button" data-copy="python -m pea.cli catalog">复制命令</button></div>
       <div class="code-panel">python -m pea.cli catalog</div>
       <div class="prompt-label"><span>步骤 2 · 按目标与保护意图搜索</span><button class="copy-button" data-copy="python -m pea.cli search --target javascript --goal obfuscation">复制命令</button></div>
