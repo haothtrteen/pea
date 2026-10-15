@@ -1,4 +1,4 @@
-.PHONY: help install install-dev check lint format typecheck test contracts integration cli-smoke verify-real verify-loop release-pkg clean
+.PHONY: help install install-dev check lint format typecheck test contracts integration cli-smoke sync-landing verify-real verify-loop release-pkg clean
 
 #: 版本单一真源：pyproject.toml（发布包名由它派生，页面下载链接与之一致）
 VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
@@ -33,6 +33,10 @@ integration: ## 全集成面（需可选依赖 mcp>=2.0：协议层 + 契约 + �
 	pip install -e ".[dev,mcp]"
 	python -m pytest tests/test_mcpstdio.py tests/test_toolschemas.py -q
 
+sync-landing: ## 同步落地页两份副本（以 landing-page/index.html 为准覆盖根 index.html）
+	cp landing-page/index.html index.html
+	@echo "已同步 index.html；自检：python -m pytest tests/test_landing_page.py -q"
+
 cli-smoke: ## CLI 冒烟
 	pea catalog
 	pea search --target javascript --goal obfuscation
@@ -46,7 +50,7 @@ verify-loop: ## WP4 执行闭环端到端（真实工具 + node 子进程；单�
 
 release-pkg: ## 生成发布包 pea-<版本>-release.zip（仅跟踪文件；上传到仓库根目录供页面按钮下载）
 	git archive --format=zip --prefix=pea-$(VERSION)/ -o $(RELEASE_PKG) HEAD
-	@echo "生成 $(RELEASE_PKG)（版本 $(VERSION)）；上传到仓库根目录后，index.html 的下载按钮即可指向它"
+	@echo "生成 $(RELEASE_PKG)（版本 $(VERSION)）；作为 GitHub Release 附件上传后，index.html 的下载按钮即可指向它"
 
 check: lint typecheck test contracts ## 全量检查（CI 等价）
 

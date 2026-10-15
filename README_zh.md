@@ -23,6 +23,7 @@ PEA 是面向自有或获授权软件项目的软件保护研究、方案选择�
 - `docs/Adversarial-Self-Test-and-Tool-Integration-zh-CN.md`：对抗性自测与保护工具分层集成——`attack-simulation.schema.json` 合同（红线入 schema）、四层集成模型（L1 配置生成 / L2 自装驱动 / L3 受控执行 / L4 目录参考，按许可定层）、攻击侧工具"不分发不自动装"边界。
 - `docs/Attack-Verification-and-Field-Feedback-Design-zh-CN.md`：第三环设计冻结——实测攻击验证（REA 作为自测 oracle、任务简报五要素、环境分层 T0–T4 与 `testbench` 侦察域、源码作弊码原则）与战场反馈回路（D7：破解包 intake、服务端球门轮换、纠缠而非隐藏、中性失效红线），含六个工作包的落地清单。
 - `docs/Phase4-Access-Orchestration-Execution-Design-zh-CN.md`：Phase 4 设计冻结——官方 SDK 的 MCP stdio server（合同驱动的工具发现，核心零依赖不破）、`pea.run_assessment` 任务编排器（任务持久化 + 中断恢复）、受控执行器四件套（apply/verify/compare/rollback，快照 + 令牌 + 回滚）与第一条真实保护闭环（JS canary 端到端样板），含六个工作包的落地清单。
+- `docs/Release-Notes-0.7.0-zh-CN.md` — 本版发布说明：交付了什么、怎么自证、刻意不做什么（可直接作为 GitHub Release 正文）
 - `docs/Execution-Loop-Implementation-Plan-zh-CN.md` — WP0–WP6 落地方案：外部评审处置 + 交付验收记录
 - `docs/Dual-MCP-Wiring-Guide-zh-CN.md`：双 MCP 接线指南——同一 agent 挂 PEA + REA 的实弹演练工作流（PEA 出简报 → 你的 agent 驱动你自己的 REA → 证据回流账本），含 CLI/组合层/MCP server 三种接入形态、证据回流合同与常见失败模式。
 - `schemas/attack-simulation.schema.json` + `examples/attack-simulation.flutter-licensing.example.json`：最简沙盒逆向自测方案合同与 Flutter 场景示例；红线机械执行——产物只读 `const true`、工具失败只能记 `unknown`、解释规则枚举里不存在"绝对防护"。
@@ -81,7 +82,7 @@ make verify-loop               # WP4 执行闭环七步 + 八条判据（真实�
 PYTHONPATH=src python -m pea.cli catalog
 ```
 
-> 注：v0.2.2 及更早的文档里的命令写作 `python -m pea_planner.cli ...`；包在改为标准 src 布局后更名为 `pea`，上述命令为当前形式。`landing-page/` 页面（仓库根 `index.html` 为其 GitHub Pages 首页副本）的下载按钮指向**仓库根目录的发布包** `pea-0.7.0-release.zip`（`make release-pkg` 生成）；`landing-page/downloads/PEA-Design-Kit-v0.5.0.zip` 是 0.5.0 时期的历史设计包。
+> 注：v0.2.2 及更早的文档里的命令写作 `python -m pea_planner.cli ...`；包在改为标准 src 布局后更名为 `pea`，上述命令为当前形式。`landing-page/` 页面（仓库根 `index.html` 为其 GitHub Pages 首页副本，两处改动后跑 `make sync-landing` 同步）的下载按钮指向 **GitHub Release 附件** `pea-0.7.0-release.zip`（`make release-pkg` 生成后上传为附件；包不在仓库树里，`raw/main` 路径不存在）；`landing-page/downloads/PEA-Design-Kit-v0.5.0.zip` 是 0.5.0 时期的历史设计包。
 
 ## 仓库结构
 
