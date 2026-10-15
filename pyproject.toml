@@ -101,3 +101,13 @@ strict = false
 warn_unused_ignores = true
 warn_redundant_casts = true
 disallow_untyped_defs = true
+
+# The official MCP SDK is an *optional* dependency: the core package must
+# import without it (that is part of the contract). The CI core-only job runs
+# mypy in an environment where `mcp` is deliberately absent, so the missing
+# stub is expected - a property of the environment, not a defect in the code.
+# With the extra installed (full-integration job) these imports are still
+# type-checked against the real SDK, unchanged.
+[[tool.mypy.overrides]]
+module = ["mcp", "mcp.*"]
+ignore_missing_imports = true

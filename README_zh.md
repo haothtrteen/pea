@@ -81,7 +81,7 @@ make verify-loop               # WP4 执行闭环七步 + 八条判据（真实�
 PYTHONPATH=src python -m pea.cli catalog
 ```
 
-> 注：v0.2.2 及更早的文档里的命令写作 `python -m pea_planner.cli ...`；包在改为标准 src 布局后更名为 `pea`，上述命令为当前形式。`landing-page/` 的下载包为 `PEA-Design-Kit-v0.5.0.zip`（页面命令与当时代码一致；0.7.0 的受控执行闭环尚未重打包进下载包）。
+> 注：v0.2.2 及更早的文档里的命令写作 `python -m pea_planner.cli ...`；包在改为标准 src 布局后更名为 `pea`，上述命令为当前形式。`landing-page/` 页面（仓库根 `index.html` 为其 GitHub Pages 首页副本）的下载按钮指向**仓库根目录的发布包** `pea-0.7.0-release.zip`（`make release-pkg` 生成）；`landing-page/downloads/PEA-Design-Kit-v0.5.0.zip` 是 0.5.0 时期的历史设计包。
 
 ## 仓库结构
 

@@ -44,3 +44,7 @@ node_modules/
 
 # Release artifact built for distribution (not source)
 /pea-*.zip
+
+# Local delivery artifacts (git patches handed to the operator for a remote
+# that has no credentials here). Not source: never commit them.
+/patches/

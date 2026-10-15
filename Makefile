@@ -1,4 +1,8 @@
-.PHONY: help install install-dev check lint format typecheck test contracts integration cli-smoke verify-real verify-loop clean
+.PHONY: help install install-dev check lint format typecheck test contracts integration cli-smoke verify-real verify-loop release-pkg clean
+
+#: 版本单一真源：pyproject.toml（发布包名由它派生，页面下载链接与之一致）
+VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+RELEASE_PKG := pea-$(VERSION)-release.zip
 
 help: ## 显示可用目标
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -39,6 +43,10 @@ verify-real: ## L2 真实工兵层（对合成形态 canary 产物跑真实域�
 
 verify-loop: ## WP4 执行闭环端到端（真实工具 + node 子进程；单独触发，不在 check 内）
 	python3 scripts/verify_loop.py
+
+release-pkg: ## 生成发布包 pea-<版本>-release.zip（仅跟踪文件；上传到仓库根目录供页面按钮下载）
+	git archive --format=zip --prefix=pea-$(VERSION)/ -o $(RELEASE_PKG) HEAD
+	@echo "生成 $(RELEASE_PKG)（版本 $(VERSION)）；上传到仓库根目录后，index.html 的下载按钮即可指向它"
 
 check: lint typecheck test contracts ## 全量检查（CI 等价）
 
