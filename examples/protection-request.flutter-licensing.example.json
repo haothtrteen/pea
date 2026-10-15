@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "project_path": "./flutter-licensing-app",
+  "authorization": "owner",
+  "targets": ["android", "flutter"],
+  "languages": ["dart", "kotlin"],
+  "goals": ["licensing_hardening", "obfuscation", "logic_extraction"],
+  "protected_symbols": ["LicenseValidator.validate", "LicenseStore.sign", "LicenseCache.refresh"],
+  "threat_model": "competent_reverse_engineer",
+  "offline_required": true,
+  "execution_mode": "plan_only",
+  "allow_network": false,
+  "distribution": "external_limited",
+  "audience": "partners",
+  "device_control": "unknown_devices",
+  "update_channel": "signed_updates",
+  "secret_can_leave_client": "no",
+  "cross_platform_requirements": "仅 Android arm64；桌面端暂无计划",
+  "test_baseline": "partial",
+  "assets": "授权校验与签名逻辑，位于 Dart AOT 快照（libapp.so）内",
+  "notes": "场景走查用例：Flutter 授权逻辑保护。授权逻辑以 Dart 实现，编译进 lib/arm64-v8a/libapp.so；应用以离线授权形式有限分发给合作方设备。已知公开分析路径为 blutter（解析 Dart AOT 快照恢复类/方法并生成 Frida 钩子）与 reFlutter（替换引擎转储快照 / 绕过 TLS 校验）。用户初始直觉是「用 R8 混淆」，但 R8 只作用于 Android Java/Kotlin 宿主层，不触及 Dart 快照，需轻引导纠正。"
+}

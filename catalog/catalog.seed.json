@@ -1,0 +1,335 @@
+[
+  {
+    "schema_version": "1.0",
+    "id": "javascript-obfuscator",
+    "name": "javascript-obfuscator",
+    "category": "source_obfuscator",
+    "targets": [
+      "javascript",
+      "typescript",
+      "nodejs",
+      "browser"
+    ],
+    "capabilities": [
+      "identifier_mangling",
+      "string_transformation",
+      "control_flow_options"
+    ],
+    "repository_url": "https://github.com/javascript-obfuscator/javascript-obfuscator",
+    "documentation_url": "https://github.com/javascript-obfuscator/javascript-obfuscator#readme",
+    "license": {
+      "spdx": "BSD-2-Clause",
+      "status": "verified",
+      "checked_at": "2026-10-13",
+      "notes": "核对仓库 LICENSE；集成前仍需锁定版本并复核。"
+    },
+    "maintenance": {
+      "state": "active",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "README 与仓库结构可见；生产接入时读取实际 release/commit 元数据。"
+    },
+    "verification_status": "candidate_requires_project_tests",
+    "trust_level": "medium",
+    "version_policy": "exact_pin",
+    "limits": [
+      "只应用于用户拥有/获授权的源码",
+      "混淆可能显著影响性能和文件体积",
+      "不替代服务端秘密管理",
+      "动态特性和 source map 策略须单独验证"
+    ],
+    "notes": "目录种子候选。这里不表示已在任意用户项目上通过验证。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "pyarmor",
+    "name": "PyArmor",
+    "category": "source_obfuscator",
+    "targets": [
+      "python"
+    ],
+    "capabilities": [
+      "python_obfuscation",
+      "runtime_packaging"
+    ],
+    "repository_url": "https://pyarmor.readthedocs.io/",
+    "documentation_url": "https://pyarmor.readthedocs.io/en/stable/",
+    "license": {
+      "spdx": null,
+      "status": "needs_review",
+      "checked_at": "2026-10-13",
+      "notes": "使用前核查当前商业/免费版本条款、部署范围和目标平台许可。"
+    },
+    "maintenance": {
+      "state": "active",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "以官方文档为发现入口，生产接入时锁定实际版本并复核许可。"
+    },
+    "verification_status": "candidate_requires_project_tests",
+    "trust_level": "medium",
+    "version_policy": "exact_pin",
+    "limits": [
+      "无法保证运行时内存数据不可提取",
+      "解释器和运行时扩展仍是信任边界",
+      "目标 Python/操作系统/打包器组合需测试"
+    ],
+    "notes": "当前状态需许可审查，因此规划器不得将其作为默认生产方案。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "android-r8",
+    "name": "Android R8 / shrinker",
+    "category": "platform_native",
+    "targets": [
+      "android",
+      "java",
+      "kotlin"
+    ],
+    "capabilities": [
+      "shrinking",
+      "optimization",
+      "obfuscation",
+      "mapping_file"
+    ],
+    "repository_url": "https://developer.android.com/build/shrink-code",
+    "documentation_url": "https://developer.android.com/build/shrink-code",
+    "license": {
+      "spdx": "Apache-2.0",
+      "status": "needs_review",
+      "checked_at": "2026-10-13",
+      "notes": "平台文档作为入口；实际工具链及其分发许可须从 Android/Gradle 版本元数据复核。"
+    },
+    "maintenance": {
+      "state": "active",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "跟随 Android Gradle Plugin / R8 所选版本，而非独立浮动升级。"
+    },
+    "verification_status": "candidate_requires_project_tests",
+    "trust_level": "high",
+    "version_policy": "exact_pin",
+    "limits": [
+      "依赖正确的 keep 规则",
+      "反射、序列化、JNI 与第三方 SDK 需测试",
+      "mapping 文件应按崩溃诊断与访问控制策略保存"
+    ],
+    "notes": "平台原生候选；许可状态仍需实际构建链审核后方能进入生产。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "confuserex-legacy",
+    "name": "ConfuserEx（legacy reference）",
+    "category": "source_obfuscator",
+    "targets": [
+      "dotnet-framework"
+    ],
+    "capabilities": [
+      "symbol_renaming",
+      "control_flow_options",
+      "constant_resource_transformation"
+    ],
+    "repository_url": "https://github.com/yck1509/ConfuserEx",
+    "documentation_url": "https://github.com/yck1509/ConfuserEx",
+    "license": {
+      "spdx": null,
+      "status": "needs_review",
+      "checked_at": "2026-10-13",
+      "notes": "核查目标 fork 的 LICENSE 与分发义务；不同 fork 不可互相继承许可假设。"
+    },
+    "maintenance": {
+      "state": "archived",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "原仓库已归档且上游标明不再维护。"
+    },
+    "verification_status": "research_only",
+    "trust_level": "low",
+    "version_policy": "user_managed",
+    "limits": [
+      "原始上游已停止维护",
+      "不推荐现代生产工作流默认使用",
+      "旧版 .NET 范围与当前运行时兼容性有限"
+    ],
+    "notes": "作为维护状态门控的反例，只用于研究和历史项目评估。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "logic-extraction-pattern",
+    "name": "PEA Logic Extraction Pattern",
+    "category": "logic_extraction",
+    "targets": [
+      "web",
+      "desktop",
+      "mobile",
+      "cloud",
+      "hybrid"
+    ],
+    "capabilities": [
+      "server_side_logic",
+      "api_contract_generation",
+      "client_stub_generation",
+      "secret_boundary_review"
+    ],
+    "repository_url": "https://pea.example/docs/logic-extraction",
+    "documentation_url": "https://pea.example/docs/logic-extraction",
+    "license": {
+      "spdx": "NOASSERTION",
+      "status": "not_applicable",
+      "checked_at": "2026-10-13",
+      "notes": "这是设计模式，不是第三方代码项目。"
+    },
+    "maintenance": {
+      "state": "active",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "由 PEA 维护者版本化。"
+    },
+    "verification_status": "verified",
+    "trust_level": "medium",
+    "version_policy": "not_applicable",
+    "limits": [
+      "需要受控服务端/本地可信边界",
+      "网络可用性、延迟和运营成本增加",
+      "服务端 API 仍需认证、授权、速率限制和审计"
+    ],
+    "notes": "优先于把秘密固定在公开客户端中。example URL 是项目内占位标识，不是外部服务。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "pea-restricted-ir-vm",
+    "name": "PEA Restricted IR/VM (planned backend)",
+    "category": "restricted_vm",
+    "targets": [
+      "python",
+      "javascript",
+      "c",
+      "cpp",
+      "rust",
+      "dotnet"
+    ],
+    "capabilities": [
+      "pure_function_lowering",
+      "restricted_ir",
+      "bytecode_interpreter",
+      "differential_verification"
+    ],
+    "repository_url": "https://pea.example/docs/restricted-ir-vm",
+    "documentation_url": "https://pea.example/docs/restricted-ir-vm",
+    "license": {
+      "spdx": "NOASSERTION",
+      "status": "not_applicable",
+      "checked_at": "2026-10-13",
+      "notes": "尚未实现的 PEA 计划后端。"
+    },
+    "maintenance": {
+      "state": "unknown",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "未实现，不可作为生产保护器推荐。"
+    },
+    "verification_status": "research_only",
+    "trust_level": "unknown",
+    "version_policy": "not_applicable",
+    "limits": [
+      "只计划支持纯函数受限子集",
+      "尚未实现",
+      "不支持任意二进制重写",
+      "需要类型检查、资源限制、差分测试与安全审查"
+    ],
+    "notes": "仅在成熟项目不适用且用户同意承担研发成本时规划概念验证。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "shellvmp",
+    "name": "ShellVMP",
+    "category": "restricted_vm",
+    "targets": [
+      "bash",
+      "shell",
+      "linux",
+      "elf",
+      "android"
+    ],
+    "capabilities": [
+      "shell_obfuscation",
+      "streaming_decryption_claim",
+      "elf_wrapper",
+      "interpreter_tokenization_poc",
+      "preflight_lint",
+      "differential_test_workflow"
+    ],
+    "repository_url": "https://github.com/haothtrteen/ShellVMP",
+    "documentation_url": "https://github.com/haothtrteen/ShellVMP",
+    "license": {
+      "spdx": null,
+      "status": "needs_review",
+      "checked_at": "2026-10-13",
+      "notes": "官方仓库页面显示 AGPL-3.0 LICENSE，并提供单独商业许可文件；准确适用路径、当前分支与商业授权边界需逐项核验。不得默认作为可并入 PEA 的依赖。"
+    },
+    "maintenance": {
+      "state": "unknown",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "网页可见主分支与提交历史，但本地未 clone，也未固定 commit/release；不据此判断成熟度。"
+    },
+    "verification_status": "research_only",
+    "trust_level": "medium",
+    "version_policy": "user_managed",
+    "limits": [
+      "公开页面和 README 已阅读；源码/commit 未审计",
+      "反调试与环境门控默认不启用",
+      "文档自述的流式明文窗口/反内存读取能力需逐平台验证",
+      "shell 语义差异、Bash/mksh 版本和系统 ABI 需要测试",
+      "AGPL 与商业双授权需进行项目级许可证审查",
+      "不代表 PEA 已复现其保护能力"
+    ],
+    "notes": "状态仅为 documentation_reviewed。研究优先级：预检 lint、保护目标清单、真实插桩验证、语义差分和兼容性矩阵。"
+  },
+  {
+    "schema_version": "1.0",
+    "id": "fdartvmp",
+    "name": "FDartVMP",
+    "category": "restricted_vm",
+    "targets": [
+      "dart",
+      "flutter",
+      "android",
+      "native-library"
+    ],
+    "capabilities": [
+      "dart_function_to_private_ir",
+      "bytecode_container",
+      "native_interpreter",
+      "ffi_stub",
+      "apk_protection_checks",
+      "differential_test_workflow"
+    ],
+    "repository_url": "https://github.com/haothtrteen/FDartVMP",
+    "documentation_url": "https://github.com/haothtrteen/FDartVMP/blob/main/README.md",
+    "license": {
+      "spdx": "AGPL-3.0-or-later",
+      "status": "needs_review",
+      "checked_at": "2026-10-13",
+      "notes": "官方 LICENSING.md 声明 AGPL-3.0-or-later / 商业双授权；闭源分发、网络服务和第三方依赖需要单独审查，不能仅凭 SPDX 认定兼容。"
+    },
+    "maintenance": {
+      "state": "unknown",
+      "checked_at": "2026-10-13",
+      "last_release": null,
+      "notes": "官方 README 声明包含编译、差分、APK 与真机测试闭环，但本地未 clone 或复现；仓库状态、commit 与实测结果需要固定版本核验。"
+    },
+    "verification_status": "research_only",
+    "trust_level": "medium",
+    "version_policy": "user_managed",
+    "limits": [
+      "只针对特定 Flutter/Dart 保护路径，不是通用多语言 VMP",
+      "公开文档承认原生解释器可被分析，Dart 调试器可观察堆/返回值",
+      "离线分发所需运行时材料不构成密码学秘密边界",
+      "文档提到 VMPacker 是独立第三方工具且有独立许可证",
+      "AGPL 与商业双授权需要项目级审查",
+      "未完成源代码审计、commit 固定或测试复现"
+    ],
+    "notes": "状态仅为 documentation_reviewed。研究优先级：语言子集、编译器/解释器语义边界、差分覆盖、发布 APK 检查与依赖许可。"
+  }
+]

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.invalid/schemas/tool-contract.schema.json",
+  "title": "PEA MCP Tool Contract",
+  "description": "MCP 工具清单的三件套之一：输入/输出合同与副作用声明。契约门强制：每个工具必有 purpose/side_effects/approval；mutating 工具（temporary_workspace_write/output_file_write/bounded_filesystem_write/spawn_process）无审批声明即 CI 失败（该条件规则由 tests/test_contracts.py 的语义门执行，JSON Schema 无法表达条件依赖）。副作用取值锁定为注册表枚举：新增副作用类型必须同步本 schema 与 tool-effects.schema.json。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "server",
+    "tools"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.1"
+    },
+    "server": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_note": {
+      "type": "string"
+    },
+    "common_rules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "purpose",
+          "side_effects",
+          "approval"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^pea\\.[a-z][a-z0-9_]*$",
+            "description": "工具名必须 pea.* 命名空间化。"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input_required": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "output_required": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "side_effects": {
+            "type": "array",
+            "description": "副作用注册表取值；空数组表示纯函数式工具。",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bounded_filesystem_read",
+                "bounded_artifact_read",
+                "optional_network_read",
+                "approval_state_write",
+                "temporary_workspace_write",
+                "output_file_write",
+                "bounded_filesystem_write",
+                "spawn_process"
+              ]
+            }
+          },
+          "approval": {
+            "type": "string",
+            "minLength": 1,
+            "description": "审批要求；纯函数式工具声明 none，其余必须是具体审批机制。"
+          },
+          "execution": {
+            "type": "string",
+            "description": "执行边界备注（如 never run project scripts）。"
+          }
+        }
+      }
+    }
+  }
+}

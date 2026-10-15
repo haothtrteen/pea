@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/mission-brief.schema.json",
+  "title": "PEA Live-Fire Mission Brief",
+  "description": "任务简报：PEA 对一次实弹演练的输出物，交付给用户的 agent 驱动 REA 执行。五要素——目标锚点（来自域扫描）、工具族（来自能力映射）、环境分层（T0-T4）、判据与预算（内嵌 attack-simulation）、红线；证据经 evidence-record 回流账本。简报本身不执行任何攻击，也不捆绑任何攻击工具。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "brief_id", "generated_at", "simulation", "objective_anchors", "environment", "tool_families", "red_lines", "evidence_return", "limitations"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "brief_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "plan_id": {"type": "string", "description": "来源保护计划的 plan_id，供审计追溯。"},
+    "simulation_id": {"type": "string", "minLength": 1, "description": "内嵌 attack-simulation 的 simulation_id，两者必须一致。"},
+    "simulation": {"$ref": "attack-simulation.schema.json"},
+    "objective_anchors": {
+      "type": "array",
+      "description": "目标锚点：来自对自家工件的域扫描观察（如快照锚点、符号暴露）。空数组 = 未提供锚点，简报必须在 unknowns 中声明。",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reachable_tier", "tier_basis", "deferred_steps"],
+      "properties": {
+        "reachable_tier": {"enum": ["T0", "T1", "T2", "T3", "T4", "unknown"], "description": "测试台侦察（pea.testbench）得出的本次最高可达环境层；unknown = 未侦察。"},
+        "tier_basis": {"type": "array", "items": {"type": "string"}, "description": "可达层的依据，随简报交付以便事后重审。"},
+        "deferred_steps": {
+          "type": "array",
+          "description": "环境未达层而推迟的步骤：记 unknown，不是失败也不是通过。",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["step_id", "required_tier"],
+            "properties": {
+              "step_id": {"type": "string", "minLength": 1},
+              "required_tier": {"type": "string", "enum": ["T0", "T1", "T2", "T3", "T4"]},
+              "note": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "tool_families": {
+      "type": "array",
+      "minItems": 1,
+      "description": "本次演练涉及的能力族及其暴露层，附能力映射的检索日期注记。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_family"],
+        "properties": {
+          "capability_family": {"type": "string", "minLength": 1},
+          "exposure_tier": {"type": "string", "enum": ["tool_efficiency", "static_content", "runtime_behavior", "algorithm_logic"]},
+          "research_date": {"type": "string", "description": "能力映射中该族观察的检索日期；工具名由执行 agent 解析 REA 实时 catalog，简报只引用能力族。"}
+        }
+      }
+    },
+    "red_lines": {
+      "type": "array",
+      "minItems": 1,
+      "description": "演练红线；违反任一条的观察不得入账。",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "evidence_return": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ledger_tool", "authority_required", "environment_required", "required_fields"],
+      "properties": {
+        "ledger_tool": {"type": "string", "const": "pea.ledger_record", "description": "证据回流入口（M5 账本工具）。"},
+        "authority_required": {"type": "string", "const": "observation", "description": "第三方工具观察只能以 observation 权威入账；external_claim 需人工确认。"},
+        "environment_required": {"type": "boolean", "const": true, "description": "每条证据必须声明 environment 块（环境分层），缺失即拒收。"},
+        "required_fields": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "evidence-record 必填字段（tool_name/tool_version/artifact_digest/authority/redacted_summary 等）。"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "unknowns": {"type": "array", "items": {"type": "string"}}
+  }
+}

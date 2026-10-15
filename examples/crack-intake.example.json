@@ -1,0 +1,99 @@
+{
+  "baseline_path": "samples/original/app-release",
+  "coverage": {
+    "omissions": [],
+    "scope": "破解包 intake：七域复用之 manifest 域 + digest diff（只读）",
+    "state": "partial"
+  },
+  "cracked_path": "samples/cracked/app-cracked",
+  "diffs": [
+    {
+      "baseline_sha256": "c3c358c86771fd5e11b55682a4b470ee531190c9f15497d4444f71ca5e8d2fba",
+      "change": "modified",
+      "cracked_sha256": "6c339e7f13640565338d8f59f88fcf4f793af248b3355d4607d535ef501a864e",
+      "kind": "flutter_dart_snapshot",
+      "path": "lib/arm64-v8a/libapp.so"
+    },
+    {
+      "baseline_sha256": null,
+      "change": "added",
+      "cracked_sha256": "f812c8d98720e2159fada9284402ea11eff9524f0540f1e06d2abded109f40df",
+      "kind": "native_shared_library",
+      "path": "lib/arm64-v8a/libpatch.so"
+    }
+  ],
+  "findings": [
+    {
+      "category": "field_incident_diff",
+      "coverage": {
+        "scope": "manifest digest diff（仅覆盖双方枚举到的产物）",
+        "state": "partial"
+      },
+      "evidence": [
+        {
+          "authority": "observation",
+          "evidence_id": "ev-crack-diff",
+          "kind": "file_observation",
+          "limitations": [
+            "破解包 intake：只读扫描 + manifest digest diff；不覆盖未枚举路径"
+          ],
+          "observed_at": "2026-10-14T00:00:00+00:00",
+          "redacted_summary": "manifest diff：modified 1 / added 1 / removed 0；lib/arm64-v8a/libapp.so",
+          "source": "pea.fieldresponse:samples/cracked/app-cracked vs samples/original/app-release"
+        }
+      ],
+      "exposure_tier": "tool_efficiency",
+      "id": "crack-intake-manifest-diff",
+      "limitations": [
+        "diff 是 observation；'哪条防护失效'是推断，需人工确认",
+        "未枚举路径的改动不可见"
+      ],
+      "recommended_actions": [
+        "人工核对每个 modified 产物的改动性质",
+        "将 diff 事实入账（observation 权威）"
+      ],
+      "severity": "high",
+      "status": "observed",
+      "summary": "manifest diff：modified 1 / added 1 / removed 0；lib/arm64-v8a/libapp.so",
+      "title": "破解包与原版 manifest 差异"
+    },
+    {
+      "category": "field_incident_layer_attribution",
+      "coverage": {
+        "scope": "digest diff + 产物类型推断",
+        "state": "partial"
+      },
+      "evidence": [
+        {
+          "authority": "inference",
+          "evidence_id": "ev-crack-modified-lib_arm64-v8a_libapp_so",
+          "kind": "inference",
+          "limitations": [
+            "破解包 intake：只读扫描 + manifest digest diff；不覆盖未枚举路径"
+          ],
+          "observed_at": "2026-10-14T00:00:00+00:00",
+          "redacted_summary": "baseline=c3c358c86771fd5e11b55682a4b470ee531190c9f15497d4444f71ca5e8d2fba cracked=6c339e7f13640565338d8f59f88fcf4f793af248b3355d4607d535ef501a864e",
+          "source": "pea.fieldresponse:samples/cracked/app-cracked vs samples/original/app-release"
+        }
+      ],
+      "exposure_tier": "tool_efficiency",
+      "id": "crack-intake-modified-lib_arm64-v8a_libapp_so",
+      "limitations": [
+        "层归属是推断；同 digest 变化可能有与防护无关的解释（重打包、时间戳）"
+      ],
+      "recommended_actions": [
+        "对比构建配置与符号表确认改动性质",
+        "在响应计划中将该产物作为球门轮换的触发锚点"
+      ],
+      "severity": "high",
+      "status": "inferred",
+      "summary": "lib/arm64-v8a/libapp.so（kind=flutter_dart_snapshot）digest 变化；按产物类型推断最可能受压制的暴露层为 tool_efficiency。推断需人工确认——digest 变化本身不等于某条具体防护被剥。",
+      "title": "改动产物疑对应防护层失效：lib/arm64-v8a/libapp.so"
+    }
+  ],
+  "unknowns": [
+    "破解包新增文件 lib/arm64-v8a/libpatch.so：内容与用途未分析，不得假定为恶意载荷",
+    "改动产物是否重新签名、是否含额外通信端点，未分析",
+    "合法用户中是否存在误装变体，未评估"
+  ]
+}

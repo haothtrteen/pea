@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "plan_id": "plan-demo-0001",
+  "request_id": "request-demo-0001",
+  "status": "needs_user_review",
+  "strategy": "existing_tool",
+  "selected_catalog_ids": ["javascript-obfuscator"],
+  "candidate_scores": [
+    {
+      "id": "javascript-obfuscator",
+      "score": 84.44,
+      "basis": ["capability_fit", "platform_fit", "maintenance", "license", "build_integration", "provenance"]
+    }
+  ],
+  "steps": [
+    {"id": "S1", "kind": "review", "description": "确认符号范围、许可证与构建基线", "side_effect": false},
+    {"id": "S2", "kind": "apply_in_workspace", "description": "仅在临时工作区对确认的源码运行固定版本的混淆器", "requires_approval": true},
+    {"id": "S3", "kind": "verify", "description": "执行单元测试、公开 API/动态加载测试、性能与产物检查", "requires_approval": true},
+    {"id": "S4", "kind": "report", "description": "导出 diff、版本、哈希、测试报告和回滚指引", "side_effect": false}
+  ],
+  "risks": [
+    "混淆可能增加代码体积或运行时间",
+    "敏感逻辑仍可在客户端运行时被观察",
+    "目录条目的兼容性尚需在目标项目上验证"
+  ],
+  "verification_gates": ["protected_output_unit_tests_pass", "compatibility_tests_pass", "performance_within_budget", "license_review_pass", "artifact_hash_recorded"],
+  "side_effects": ["运行外部工具", "在临时工作区写入输出"],
+  "approval_token": null,
+  "rollback": ["删除 PEA 临时工作区", "正式工作树仅通过审阅后的补丁更新"]
+}

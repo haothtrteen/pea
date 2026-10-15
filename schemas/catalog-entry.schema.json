@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/catalog-entry.schema.json",
+  "title": "PEA Catalog Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "name", "category", "targets", "capabilities", "repository_url", "license", "maintenance", "verification_status", "limits"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,79}$"},
+    "name": {"type": "string", "minLength": 1},
+    "category": {"type": "string", "enum": ["platform_native", "source_obfuscator", "binary_protector", "logic_extraction", "restricted_vm", "integrity", "licensing"]},
+    "targets": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "capabilities": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "repository_url": {"type": "string", "format": "uri"},
+    "documentation_url": {"type": "string", "format": "uri"},
+    "license": {
+      "type": "object", "additionalProperties": false, "required": ["spdx", "status"],
+      "properties": {"spdx": {"type": ["string", "null"]}, "status": {"type": "string", "enum": ["verified", "needs_review", "incompatible", "not_applicable"]}, "checked_at": {"type": ["string", "null"], "format": "date"}, "notes": {"type": "string"}}
+    },
+    "maintenance": {
+      "type": "object", "additionalProperties": false, "required": ["state", "checked_at"],
+      "properties": {"state": {"type": "string", "enum": ["active", "slow", "archived", "unknown"]}, "checked_at": {"type": ["string", "null"], "format": "date"}, "last_release": {"type": ["string", "null"]}, "notes": {"type": "string"}}
+    },
+    "verification_status": {"type": "string", "enum": ["verified", "candidate_requires_project_tests", "research_only", "blocked"]},
+    "trust_level": {"type": "string", "enum": ["high", "medium", "low", "unknown"]},
+    "version_policy": {"type": "string", "enum": ["exact_pin", "semver_minor", "user_managed", "not_applicable"]},
+    "limits": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  }
+}

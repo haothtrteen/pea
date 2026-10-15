@@ -1,0 +1,4 @@
+# 分发包（landing-page 下载目录）是 git 里的分发产物，供官网下载链接使用；
+# 但 git archive 生成源码分发包时必须排除它们——否则包里会嵌套上一个
+# 分发包（甚至自引用）。export-ignore 让任何提交的 archive 都不含这些 zip。
+landing-page/downloads/*.zip export-ignore

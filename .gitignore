@@ -1,0 +1,46 @@
+# --- Python ---
+# NOTE: build/ and dist/ are root-anchored on purpose. The global form used to
+# swallow demo/canary-artifacts/build/ (the checked-in synthetic canary
+# artifacts the test suite expects); the release zip then shipped without them
+# and a fresh unpack failed the suite until the user rebuilt them.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.venv/
+venv/
+
+# --- Node ---
+node_modules/
+
+# --- Vendored upstream reference ---
+# REA is cloned here read-only as an engineering reference. It carries its own
+# .git and license; it must not be committed into PEA. See references/PROVENANCE.md.
+/references/rea/
+
+# --- User-uploaded third-party material without a license ---
+# docs/skill-lang-vmp-guide-original.zip was uploaded by a user and contains no
+# independent LICENSE file. Per sources.md it is retained locally only and must
+# not be published until the rights holder confirms the licence. Keep it out of git.
+/docs/skill-lang-vmp-guide-original.zip
+
+# --- Local scratch outputs from the planner CLI ---
+/tmp/
+*.plan.json
+
+# --- Editor / OS ---
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# Release artifact built for distribution (not source)
+/pea-*.zip

@@ -1,0 +1,1010 @@
+{
+  "note": "MCP 工具调用面（tools/list 的 inputSchema）的合同真源。每个条目是一个 JSON Schema 2020-12 object；required 必须与 mcp/tool-contract.json 同名工具的 input_required 一致（契约门断言）。字段与类型以 mcpserver.py 处理器实际读取为准——schema 描述实现，不发明参数。additionalProperties 为 false：客户端传未声明字段即命名拒绝，handler 不做隐式宽恕。",
+  "schema_version": "1.0",
+  "tools": {
+    "pea.apply_plan": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_token": {
+          "description": "review_plan 在可信审批事件存在时签发的一次性令牌；消耗点校验重放/过期/范围六元组",
+          "minLength": 1,
+          "type": "string"
+        },
+        "expected_artifact_digest": {
+          "description": "可选：期望的工件 digest",
+          "type": "string"
+        },
+        "expected_plan_digest": {
+          "description": "签发时的计划 digest；计划变化即 scope_mismatch",
+          "minLength": 1,
+          "type": "string"
+        },
+        "plan_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id",
+        "approval_token",
+        "expected_plan_digest"
+      ],
+      "type": "object"
+    },
+    "pea.assess_project": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "description": "授权等级；未确认授权的调用被命名拒绝",
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "description": "目标项目根目录（必须位于授权根内）",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.check_build_integration": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.check_dart_aot": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.check_native": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.check_testbench": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "pea.compare_results": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "candidate_run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "preview_confirmed": {
+          "description": "产物范围已由调用方确认（artifact_scope_confirmation 的协议表达）",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "baseline_run_id",
+        "candidate_run_id"
+      ],
+      "type": "object"
+    },
+    "pea.demo_run": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "out": {
+          "description": "可选：报告与 bundle 的输出目录",
+          "type": "string"
+        },
+        "output_write_confirmed": {
+          "description": "输出目录已存在时确认覆盖（否则 output_overwrite_not_confirmed）",
+          "type": "boolean"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "request": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "request",
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.design_attack_simulation": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "additionalProperties": false,
+          "description": "基线产物引用",
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "goals": {
+          "description": "保护目标（可选）",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "has_authorization_logic": {
+          "type": "boolean"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "plan_id": {
+          "type": "string"
+        },
+        "platforms": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "protected": {
+          "additionalProperties": false,
+          "description": "可选：保护后产物引用",
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "recon_unknowns": {
+          "description": "侦察产生的 unknown（带入简报）",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "time_budget_minutes": {
+          "description": "时间预算（分钟），默认 180",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "baseline",
+        "languages",
+        "platforms"
+      ],
+      "type": "object"
+    },
+    "pea.design_field_response": {
+      "additionalProperties": false,
+      "properties": {
+        "intake": {
+          "description": "pea.intake_cracked_artifact 的输出",
+          "type": "object"
+        },
+        "offline_required": {
+          "description": "声明纯离线姿态：计划被拒绝（declined）而非空产出",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "intake"
+      ],
+      "type": "object"
+    },
+    "pea.design_mission_brief": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "brief_id": {
+          "type": "string"
+        },
+        "environment": {
+          "description": "pea.check_testbench 的输出；缺失时简报照常产出（reachable_tier=unknown）",
+          "type": "object"
+        },
+        "goals": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "has_authorization_logic": {
+          "type": "boolean"
+        },
+        "languages": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "objective_anchors": {
+          "description": "目标锚点（来自域扫描观察，脱敏）",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "plan_id": {
+          "type": "string"
+        },
+        "platforms": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "protected": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "type": "object"
+        },
+        "recon_unknowns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "time_budget_minutes": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "baseline",
+        "languages",
+        "platforms"
+      ],
+      "type": "object"
+    },
+    "pea.export_report": {
+      "additionalProperties": false,
+      "properties": {
+        "bundle": {
+          "description": "JSON bundle（机器审计用）",
+          "type": "object"
+        },
+        "markdown": {
+          "description": "已渲染的脱敏 Markdown 报告",
+          "type": "string"
+        },
+        "output_dir": {
+          "description": "输出目录；已存在且未确认覆盖即拒绝",
+          "minLength": 1,
+          "type": "string"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "output_dir"
+      ],
+      "type": "object"
+    },
+    "pea.fetch_capability_intel": {
+      "additionalProperties": false,
+      "properties": {
+        "domains": {
+          "description": "域 allowlist（可选）",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "family": {
+          "description": "能力族（可选）",
+          "type": "string"
+        },
+        "keywords": {
+          "description": "检索关键词",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "keywords"
+      ],
+      "type": "object"
+    },
+    "pea.get_task": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "description": "任务 id（task- 前缀加 8 位十六进制，同时是 store 下的目录名）",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id"
+      ],
+      "type": "object"
+    },
+    "pea.inspect_candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id_or_url": {
+          "description": "候选 id 或官方仓库 URL",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_id_or_url"
+      ],
+      "type": "object"
+    },
+    "pea.intake_cracked_artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "baseline_path": {
+          "description": "原始构建根目录（只读）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "cracked_path": {
+          "description": "破解包根目录（只读）",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "cracked_path",
+        "baseline_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_audit_unknowns": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_export": {
+      "additionalProperties": false,
+      "properties": {
+        "markdown": {
+          "description": "脱敏 Markdown 正文",
+          "type": "string"
+        },
+        "output_dir": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "output_write_confirmed": {
+          "description": "输出目录已存在时确认覆盖",
+          "type": "boolean"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "output_dir"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_gate": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_query": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "additionalProperties": false,
+          "description": "过滤条件（kind/authority/domain/severity/status）",
+          "properties": {
+            "authority": {
+              "type": "string"
+            },
+            "domain": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "open",
+                "resolved",
+                "wont_resolve"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "filters"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_record": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "description": "证据记录（evidence-record schema）",
+          "type": "object"
+        },
+        "explicit_user_approval": {
+          "description": "调用方显式确认（审批门的协议表达）；缺省即未确认",
+          "type": "boolean"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "unknown": {
+          "description": "可选：本证据产生的 unknown",
+          "properties": {
+            "domain": {
+              "type": "string"
+            },
+            "question": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "recommended_probes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "required_authority": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "question"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "run_id",
+        "evidence"
+      ],
+      "type": "object"
+    },
+    "pea.ledger_resolve": {
+      "additionalProperties": false,
+      "properties": {
+        "contradicting": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "evidence_id": {
+          "description": "单侧（supporting）证据 id；双向证据必须用 supporting+contradicting",
+          "type": "string"
+        },
+        "explicit_user_approval": {
+          "description": "调用方显式确认（审批门的协议表达）；缺省即未确认",
+          "type": "boolean"
+        },
+        "resolution": {
+          "description": "消解说明（resolved 时必填）",
+          "type": "string"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "open",
+            "resolved",
+            "wont_resolve"
+          ],
+          "type": "string"
+        },
+        "supporting": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "unknown_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "unknown_id",
+        "evidence_id"
+      ],
+      "type": "object"
+    },
+    "pea.list_tasks": {
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "pea.map_exposure": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "description": "授权等级；未确认授权的调用被命名拒绝",
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "target_manifest": {
+          "description": "目标产物清单（路径或清单标识）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "targets": {
+          "description": "目标平台/技术列表",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_manifest",
+        "targets"
+      ],
+      "type": "object"
+    },
+    "pea.plan_protection": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_snapshot": {
+          "description": "候选目录快照（匹配与门控的输入）",
+          "type": "object"
+        },
+        "profile": {
+          "description": "pea.assess_project 的项目画像输出",
+          "type": "object"
+        },
+        "project_path": {
+          "description": "执行目标项目路径（WP3：记入计划并进入 digest；不提供则计划无目标，执行面拒绝）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "request": {
+          "description": "protection-request（部署姿态访谈产物）",
+          "type": "object"
+        }
+      },
+      "required": [
+        "request",
+        "profile",
+        "catalog_snapshot"
+      ],
+      "type": "object"
+    },
+    "pea.resume_task": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "description": "授权等级；未确认授权的调用被命名拒绝",
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "task_id": {
+          "description": "任务 id（task- 前缀加 8 位十六进制，同时是 store 下的目录名）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "time_budget_minutes": {
+          "description": "攻击自测方案的时间预算（分钟）",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "task_id",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.review_candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_id"
+      ],
+      "type": "object"
+    },
+    "pea.review_plan": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_digest": {
+          "description": "可选：随令牌绑定的工件 digest",
+          "minLength": 1,
+          "type": "string"
+        },
+        "expected_plan_digest": {
+          "description": "可选：调用方期望的计划 digest；与存储记录重算值不一致即拒绝（plan_digest_mismatch）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "explicit_user_approval": {
+          "description": "显式用户批准；非 true 即拒绝（explicit_approval_missing）",
+          "type": "boolean"
+        },
+        "plan_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id",
+        "explicit_user_approval"
+      ],
+      "type": "object"
+    },
+    "pea.rollback": {
+      "additionalProperties": false,
+      "properties": {
+        "explicit_user_approval": {
+          "description": "调用方显式确认执行回滚（explicit_user_confirmation 的协议表达）",
+          "type": "boolean"
+        },
+        "mode": {
+          "description": "回滚模式",
+          "minLength": 1,
+          "type": "string"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode"
+      ],
+      "type": "object"
+    },
+    "pea.run_assessment": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "description": "授权等级；未确认授权的调用被命名拒绝",
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "description": "目标项目根目录（必须位于授权根内；任务记录它作为证据基准）",
+          "minLength": 1,
+          "type": "string"
+        },
+        "request": {
+          "description": "保护请求对象（targets/languages/goals/threat_model 等；授权状态同时写在 request.authorization）",
+          "type": "object"
+        },
+        "time_budget_minutes": {
+          "description": "攻击自测方案的时间预算（分钟）",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request",
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.scan_artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.scan_secrets": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.scan_strings_symbols": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization": {
+          "enum": [
+            "owner",
+            "written_authorization"
+          ],
+          "type": "string"
+        },
+        "project_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_path",
+        "authorization"
+      ],
+      "type": "object"
+    },
+    "pea.search_catalog": {
+      "additionalProperties": false,
+      "properties": {
+        "goals": {
+          "description": "保护目标枚举",
+          "items": {
+            "enum": [
+              "obfuscation",
+              "tamper_detection",
+              "logic_extraction",
+              "licensing_hardening",
+              "resource_protection",
+              "function_virtualization"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "include_research": {
+          "description": "是否包含社区研究状态的候选条目",
+          "type": "boolean"
+        },
+        "targets": {
+          "description": "目标平台/技术列表",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "targets",
+        "goals"
+      ],
+      "type": "object"
+    },
+    "pea.verify_output": {
+      "additionalProperties": false,
+      "properties": {
+        "preview_confirmed": {
+          "description": "命令预览已由调用方确认（test_command_preview_required 的协议表达）",
+          "type": "boolean"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "test_command": {
+          "description": "预览过的测试命令（结构化 argv，逐元素执行、不经 shell）；不提供则自动检测并记录命令来源",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "test_profile": {
+          "description": "测试画像（预览过的测试命令集）",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "test_profile"
+      ],
+      "type": "object"
+    }
+  }
+}

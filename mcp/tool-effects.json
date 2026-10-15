@@ -1,0 +1,1076 @@
+{
+  "generated_from": "src/pea/tooleffects.py",
+  "schema": "tool-effects.schema.json",
+  "tools": [
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "read_only_project_profile",
+        "language_and_build_detection"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.assess_project",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "capability_map_with_exposure_tiers",
+        "tier_ordering"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.map_exposure",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "network_policy_if_online",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "local_catalog_search",
+        "optional_online_discovery"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "handler_failed",
+        "network_unavailable",
+        "blocked_domain",
+        "all_sources_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.search_catalog",
+      "network_hosts": [
+        "localhost"
+      ],
+      "permissions": [
+        "filesystem:read:<catalog>",
+        "network:read:<allowlist>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "network_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "network_policy_if_online",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "candidate_metadata_review",
+        "license_and_dependency_surface"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "candidate_unknown",
+        "handler_failed",
+        "network_unavailable",
+        "blocked_domain"
+      ],
+      "idempotent": true,
+      "name": "pea.inspect_candidate",
+      "permissions": [
+        "filesystem:read:<catalog>",
+        "network:read:<allowlist>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "network_read",
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "plan_generation",
+        "exclusion_and_risk_declaration",
+        "plan_persistence"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.plan_protection",
+      "permissions": [],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "none"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "approval_token_issuance",
+        "plan_digest_freeze",
+        "approval_scope_preview"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "explicit_approval_missing",
+        "approval_authority_missing",
+        "execution_roots_unconfigured",
+        "path_outside_authorized_root",
+        "run_store_missing",
+        "plan_unknown",
+        "plan_record_corrupt",
+        "plan_digest_mismatch",
+        "plan_target_missing",
+        "tool_selection_ambiguous",
+        "adapter_not_registered",
+        "no_js_sources",
+        "options_unknown",
+        "tool_runtime_missing",
+        "tool_not_installed",
+        "tool_install_failed",
+        "tool_timeout",
+        "tool_execution_failed",
+        "run_unknown",
+        "verify_without_apply",
+        "workspace_missing",
+        "rollback_mode_unknown",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.review_plan",
+      "permissions": [
+        "approval:issue_token"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "approval_state_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "valid_scoped_one_time_token",
+      "cancellation": "cleanup_on_cancel",
+      "capabilities": [
+        "controlled_execution",
+        "snapshot_before_mutate"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "approval_authority_missing",
+        "token_unknown",
+        "token_replayed",
+        "token_expired",
+        "scope_mismatch",
+        "execution_roots_unconfigured",
+        "path_outside_authorized_root",
+        "run_store_missing",
+        "plan_unknown",
+        "plan_record_corrupt",
+        "plan_digest_mismatch",
+        "plan_target_missing",
+        "tool_selection_ambiguous",
+        "adapter_not_registered",
+        "no_js_sources",
+        "options_unknown",
+        "tool_runtime_missing",
+        "tool_not_installed",
+        "tool_install_failed",
+        "tool_timeout",
+        "tool_execution_failed",
+        "run_unknown",
+        "verify_without_apply",
+        "workspace_missing",
+        "rollback_mode_unknown",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.apply_plan",
+      "permissions": [
+        "workspace:write:<isolated>",
+        "process:spawn:<registered_adapter>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 16777216,
+        "timeout_seconds": 900
+      },
+      "side_effects": [
+        "bounded_filesystem_write",
+        "spawn_process"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "test_command_preview_required",
+      "cancellation": "cleanup_on_cancel",
+      "capabilities": [
+        "verification_execution",
+        "three_state_gates"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "test_preview_missing",
+        "test_command_invalid",
+        "execution_roots_unconfigured",
+        "path_outside_authorized_root",
+        "run_store_missing",
+        "run_unknown",
+        "verify_without_apply",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.verify_output",
+      "permissions": [
+        "process:spawn:<previewed_command>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 16777216,
+        "timeout_seconds": 900
+      },
+      "side_effects": [
+        "spawn_process"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "artifact_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "result_comparison",
+        "missing_evidence_is_not_success"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "artifact_scope_unconfirmed",
+        "execution_roots_unconfigured",
+        "path_outside_authorized_root",
+        "run_store_missing",
+        "run_unknown",
+        "workspace_missing",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.compare_results",
+      "permissions": [
+        "artifact:read:<approved_run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "cancellation": "cleanup_on_cancel",
+      "capabilities": [
+        "report_rendering",
+        "redacted_export"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "output_overwrite_not_confirmed",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.export_report",
+      "permissions": [
+        "filesystem:write:<confirmed_output_dir>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 4194304,
+        "timeout_seconds": 120
+      },
+      "side_effects": [
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "cancellation": "cleanup_on_cancel",
+      "capabilities": [
+        "scoped_rollback"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "explicit_approval_missing",
+        "execution_roots_unconfigured",
+        "path_outside_authorized_root",
+        "run_store_missing",
+        "run_unknown",
+        "rollback_mode_unknown",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.rollback",
+      "permissions": [
+        "filesystem:delete:<pea_owned_paths>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "attack_simulation_design",
+        "tier_ordered_steps"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.design_attack_simulation",
+      "permissions": [],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "none"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "mission_brief_design",
+        "environment_tiering",
+        "evidence_contract_handoff"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "environment_invalid",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.design_mission_brief",
+      "permissions": [],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "none"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "end_to_end_walkthrough",
+        "domain_composition"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "output_overwrite_not_confirmed",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.demo_run",
+      "permissions": [
+        "filesystem:read:<authorized_root>",
+        "filesystem:write:<confirmed_output_dir>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 4194304,
+        "timeout_seconds": 120
+      },
+      "side_effects": [
+        "bounded_filesystem_read",
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "artifact_manifest",
+        "digest_fingerprinting"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.scan_artifacts",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "secret_pattern_scan",
+        "redacted_hits"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.scan_secrets",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "string_symbol_scan",
+        "leak_pattern_counts"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.scan_strings_symbols",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "native_structure_check",
+        "hardening_gap_labels"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.check_native",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "dart_snapshot_probe",
+        "no_recovery_rate_claims"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.check_dart_aot",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "build_declaration_compare",
+        "abi_coverage_check"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.check_build_integration",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "environment_recon",
+        "tier_reachability"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "probe_failed",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.check_testbench",
+      "permissions": [
+        "process:probe:<fixed_readonly_probes>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 16777216,
+        "timeout_seconds": 900
+      },
+      "side_effects": [
+        "spawn_process"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "crack_intake",
+        "manifest_diff"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "intake_path_invalid",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.intake_cracked_artifact",
+      "permissions": [
+        "filesystem:read:<authorized_root>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "field_response_design",
+        "goalpost_rotation",
+        "negative_test_design"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "intake_invalid",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.design_field_response",
+      "permissions": [],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "none"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "candidate_gating",
+        "documented_decisions"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "candidate_unknown",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.review_candidate",
+      "permissions": [
+        "filesystem:read:<catalog>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "network_policy_if_online",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "capability_intel_retrieval",
+        "allowlist_enforcement"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "handler_failed",
+        "network_unavailable",
+        "blocked_domain",
+        "redirect_out_of_allowlist",
+        "transport_error",
+        "http_error",
+        "oversized_response",
+        "unknown_mime",
+        "empty_result",
+        "all_sources_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.fetch_capability_intel",
+      "network_hosts": [
+        "github.com",
+        "raw.githubusercontent.com",
+        "kanxue.com",
+        "52pojie.cn",
+        "docs.flutter.dev",
+        "api.flutter.dev",
+        "github.io"
+      ],
+      "permissions": [
+        "network:read:<allowlist>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "network_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "evidence_appending"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "evidence_invalid",
+        "evidence_missing_fields",
+        "evidence_authority_invalid",
+        "evidence_id_conflict",
+        "unknown_severity_invalid",
+        "unknown_authority_invalid",
+        "unknown_id_conflict",
+        "explicit_approval_missing",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.ledger_record",
+      "permissions": [
+        "ledger:append:<run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "approval_state_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "ledger_query"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "run_id_unknown",
+        "filters_invalid",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.ledger_query",
+      "permissions": [
+        "ledger:read:<run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "residual_unknown_audit"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "run_id_unknown",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.ledger_audit_unknowns",
+      "permissions": [
+        "ledger:read:<run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "verified_gate"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "run_id_unknown",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.ledger_gate",
+      "permissions": [
+        "ledger:read:<run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "unknown_resolution",
+        "evidence_bound_resolution"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "run_id_unknown",
+        "explicit_approval_missing",
+        "unknown_not_found",
+        "unknown_status_invalid",
+        "resolution_needs_two_sided_evidence",
+        "resolution_requires_observation",
+        "resolution_text_required",
+        "evidence_not_found",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.ledger_resolve",
+      "permissions": [
+        "ledger:write:<run_scope>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "approval_state_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "ledger_export"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "run_id_invalid",
+        "run_id_unknown",
+        "output_dir_missing",
+        "output_overwrite_not_confirmed",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.ledger_export",
+      "permissions": [
+        "filesystem:write:<confirmed_output_dir>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 4194304,
+        "timeout_seconds": 120
+      },
+      "side_effects": [
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "task_orchestration",
+        "durable_resume",
+        "failure_isolation"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "request_invalid",
+        "task_store_missing",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.run_assessment",
+      "permissions": [
+        "filesystem:read:<authorized_root>",
+        "filesystem:write:<task_store>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 4194304,
+        "timeout_seconds": 120
+      },
+      "side_effects": [
+        "bounded_filesystem_read",
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "task_status_query"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "task_id_invalid",
+        "task_id_unknown",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.get_task",
+      "permissions": [
+        "filesystem:read:<task_store>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "none",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "task_listing"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "handler_failed"
+      ],
+      "idempotent": true,
+      "name": "pea.list_tasks",
+      "permissions": [
+        "filesystem:read:<task_store>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 1048576,
+        "timeout_seconds": 60
+      },
+      "side_effects": [
+        "bounded_filesystem_read"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "cancellation": "cooperative_checkpoint",
+      "capabilities": [
+        "task_resume",
+        "durable_resume"
+      ],
+      "error_codes": [
+        "unknown_tool",
+        "tool_not_wired",
+        "authorization_not_confirmed",
+        "path_outside_authorized_root",
+        "task_id_invalid",
+        "task_id_unknown",
+        "task_already_done",
+        "task_store_missing",
+        "handler_failed"
+      ],
+      "idempotent": false,
+      "name": "pea.resume_task",
+      "permissions": [
+        "filesystem:read:<authorized_root>",
+        "filesystem:write:<task_store>"
+      ],
+      "resource_limits": {
+        "max_output_bytes": 4194304,
+        "timeout_seconds": 120
+      },
+      "side_effects": [
+        "bounded_filesystem_read",
+        "bounded_filesystem_write"
+      ],
+      "version": "1.0.0"
+    }
+  ]
+}

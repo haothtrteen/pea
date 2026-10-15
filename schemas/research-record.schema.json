@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/research-record.schema.json",
+  "title": "PEA Research Record",
+  "description": "在线研究通道的结构化记录（WP5）：一次检索一个问题，来源带访问日期与版本锚点，核对与判断逐字段在案。权威级恒为 external_claim——检索结果不得直接变成候选，进入候选队列必须过 candidate-review 门。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "question",
+    "family",
+    "sources",
+    "checks",
+    "applicability",
+    "limitations",
+    "decision",
+    "decision_reason",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "record_id": {"type": "string", "pattern": "^res-[0-9a-f]{12}$"},
+    "question": {"type": "string", "minLength": 1, "description": "本次研究要回答的问题（一句话）"},
+    "family": {"type": "string", "minLength": 1, "description": "能力族（与 capintel 的 query.family 一致）"},
+    "sources": {
+      "type": "array",
+      "description": "检索来源：URL + 访问日期 + 版本/commit 锚点（可缺失，缺失即 unknown 来源）",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "retrieved_at"],
+        "properties": {
+          "url": {"type": "string", "minLength": 1},
+          "retrieved_at": {"type": "string", "minLength": 1, "description": "访问日期（ISO 8601）"},
+          "version_anchor": {"type": ["string", "null"], "description": "版本号 / commit；未锚定即 null，不是'最新'"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["license", "maintenance", "platform"],
+      "properties": {
+        "license": {"type": "string", "enum": ["verified", "needs_review", "incompatible", "unknown"]},
+        "maintenance": {"type": "string", "enum": ["active", "archived", "stale", "unknown"]},
+        "platform": {"type": "string", "enum": ["confirmed", "mismatch", "unknown"]}
+      }
+    },
+    "applicability": {
+      "type": "string",
+      "enum": ["applicable", "not_applicable", "unknown"],
+      "description": "适用性判断：unknown 不是'适用'的弱表达，是明确的第三态"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "限制声明：本记录的结论在什么条件下不可复用"
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["accepted", "rejected", "deferred"],
+      "description": "接受/拒绝/搁置。accepted 要求三项核对均非 unknown 且 applicability=applicable（机械门，见 src/pea/research.py）"
+    },
+    "decision_reason": {"type": "string", "minLength": 1, "description": "接受/拒绝/搁置的明文理由"},
+    "authority": {
+      "type": "string",
+      "const": "external_claim",
+      "description": "权威级恒为 external_claim：未经源码审计与 fixture 实测，不得升级"
+    }
+  }
+}

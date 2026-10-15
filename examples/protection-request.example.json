@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "project_path": "./examples/demo-project",
+  "authorization": "owner",
+  "targets": ["javascript", "nodejs"],
+  "languages": ["javascript"],
+  "goals": ["obfuscation", "tamper_detection"],
+  "protected_symbols": ["calculateLicenseTier"],
+  "threat_model": "competent_reverse_engineer",
+  "offline_required": true,
+  "performance_budget_percent": 8,
+  "allowed_spdx_licenses": ["BSD-2-Clause", "MIT", "Apache-2.0"],
+  "execution_mode": "plan_only",
+  "allow_network": false,
+  "notes": "样例仅生成计划。真正保护前需由用户审阅目标函数和回归测试。"
+}

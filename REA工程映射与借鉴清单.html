@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REA 工程映射与 PEA 可借鉴清单</title>
+<style>
+:root{--page:#fffefa;--surface:#f7f8f3;--ink:#202822;--muted:#5e6961;--line:#dfe5dd;--accent:#2d694e;--accent-soft:#e2efe5;--warm:#b9502f;--code:#f4f6f1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.75}
+.top{border-bottom:1px solid var(--line);padding:22px 0;background:var(--page)}
+.top .in{width:min(900px,calc(100% - 40px));margin:0 auto;display:flex;align-items:center;gap:12px}
+.mark{width:30px;height:30px;border:2px solid var(--accent);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-weight:850}
+.top b{font-size:16px;letter-spacing:-.02em}
+.top span{font-size:11px;color:var(--muted);letter-spacing:.06em}
+main{width:min(900px,calc(100% - 40px));margin:0 auto;padding:30px 0 80px}
+h1{font-size:30px;letter-spacing:-.04em;line-height:1.25;margin:.4em 0 .6em}
+h2{font-size:22px;letter-spacing:-.03em;margin:2em 0 .6em;padding-top:.5em;border-top:1px solid var(--line)}
+h3{font-size:17px;letter-spacing:-.02em;margin:1.6em 0 .4em;color:var(--accent)}
+blockquote{margin:1.2em 0;padding:12px 16px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink);font-size:14px}
+blockquote p{margin:.3em 0}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--surface);font-weight:700;white-space:nowrap}
+tr:nth-child(even) td{background:#fbfcf9}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.1em .35em}
+pre{background:var(--code);border:1px solid var(--line);border-radius:7px;padding:14px;overflow:auto}
+pre code{background:none;border:0;padding:0}
+strong{color:#111a13}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+ul,ol{padding-left:22px}
+li{margin:.3em 0}
+a{color:var(--accent)}
+</style></head><body>
+<div class="top"><div class="in"><span class="mark">P</span><div><b>PEA 项目分析报告</b><br><span>upstream bb96afdb · 只读参考</span></div></div></div>
+<main><h1>REA 工程映射与 PEA 可借鉴清单</h1>
+<blockquote>
+<p>来源：<code>/workspace/references/rea</code>，upstream commit <code>bb96afdbe32f5318d57fcb00099191c5a7712f53</code>（2026-10-12，main）
+仓库：<code>https://github.com/morluto/rea</code>（HEAD SHA 与 <code>git ls-remote</code> 直连一致，完整性已校验）
+用途：<strong>只读参考</strong>。PEA 不复制、不链接、不分发 REA 代码；本文所有条目均为"可借鉴的工程模式"，不含其实现细节的搬运。<br /><strong>时点与现状（复核于 2026-10-15，PEA 0.7.0）</strong>：本文是 2026-10-13 对 PEA 0.2.2 快照的只读分析；正文中"PEA 现状/现在"一律指<strong>该分析时点</strong>，各条已就地标注 0.7.0 的落地结果。
+这对应 PEA-070 的前置条件——此前文档记载"容器无法解析 github.com，clone 失败"，该状态<strong>在当前沙箱已解除</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、先确认一件事：PEA 的架构设计是"对"的</h2>
+<p><code>docs/architecture.mermaid</code> 显示 REA 的真实分层是：</p>
+<pre><code>Entry Points(CLI/MCP) → Composition(工厂) → Adapters(Providers) → Application(共享工作流)
+                                                                    ↓
+                                                        Contracts(对外 Schema) / Domain(纯函数)
+</code></pre>
+<p>对照 PEA <code>docs/PEA-Architecture-Spec-zh-CN.md</code> §4，PEA 画的是同一张图（Intake/Profiler/Exposure Mapper/Research/Catalog/Strategy/Approval/Adapter Runner/Verification/Evidence Ledger）。</p>
+<p><strong>结论：PEA 的架构方向没有跑偏，不需要重新设计。</strong> 缺的不是设计，是把设计落成代码——而 REA 正好提供了每个层"落地后长什么样"的实物样本。</p>
+<p>规模参照：REA 是 <strong>2422 个 TS 文件 / 约 52.5 万行 / 1338 个测试文件</strong>的 turbo monorepo。PEA 不需要这个体量，但可以借鉴它的<strong>分层纪律</strong>。</p>
+<hr />
+<h2>二、六个可直接借鉴的工程模式（按对 PEA 的价值排序）</h2>
+<h3>1. Contracts 与 Domain 分层（对应 PEA-001 / M1）</h3>
+<table>
+<thead>
+<tr>
+<th>REA</th>
+<th>PEA 现状</th>
+<th>该怎么做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/contracts/</code>（约 90 个文件，全部是<strong>调用方可见的 Schema</strong>）</td>
+<td>分析时点：<code>schemas/</code> 有 8 个 JSON Schema，但<strong>代码不引用</strong>。<strong>现状（0.7.0）</strong>：15 个 schema 是唯一真源，<code>validation.py</code> 在所有入口强校验</td>
+<td>把 <code>schemas/</code> 变成唯一真源，<code>build_plan</code> 入口强校验（<strong>已落地</strong>）</td>
+</tr>
+<tr>
+<td><code>src/domain/</code>（244 个文件，注释明确写着 "Pure side-effect-free modules"）</td>
+<td>分析时点：无对应层。<strong>现状（0.7.0）</strong>：纯函数已按此纪律分布（<code>planner</code> 打分/门控、<code>tiers</code> 分层、<code>ledger</code> 规则），未另立 <code>domain/</code> 目录——纪律落地，目录不机械复制</td>
+<td>新建 <code>pea/domain/</code>：纯函数、无 IO，打分/门控/归一化都放这里</td>
+</tr>
+<tr>
+<td><code>src/config/parseConfig.ts</code> + <code>parsers.ts</code>（Zod 校验环境变量）</td>
+<td>分析时点：无配置层。<strong>现状（0.7.0）</strong>：环境注入按同纪律落地（<code>PEA_TASK_STORE</code> / <code>PEA_LEDGER_STORE</code> / <code>PEA_RUN_STORE</code> / <code>PEA_AUTHORIZED_ROOTS</code> 集中在协议层解析，处理器只读 context）</td>
+<td>新建 <code>pea/config/</code>，用 pydantic/jsonschema 校验，禁止裸读环境变量</td>
+</tr>
+</tbody>
+</table>
+<p><strong>验收</strong>：<code>goals:["非法值"]</code> 必须在入口被拒（分析时点静默通过，见分析报告 P0-1；<strong>已落地</strong>：入口校验现在直接拒绝并列出违规路径）。</p>
+<h3>2. ToolEffects 单一注册表（对应 PEA-031，最高价值）</h3>
+<p><code>src/contracts/toolEffects.ts</code>（690 行）是本次发现的<strong>最值得借鉴的一个文件</strong>：</p>
+<ul>
+<li><code>interface ToolEffects</code> 用 11 个布尔字段穷举副作用：<code>mutatesTarget</code> / <code>mutatesSession</code> / <code>writesFilesystem</code> / <code>launchesProcess</code> / <code>accessesNetwork</code> / <code>changesUiState</code> / <code>mayDiscardData</code> / <code>executesForeignCode</code> / <code>mutatesDevice</code> / <code>idempotent</code> …</li>
+<li><code>TOOL_EFFECTS: Readonly&lt;Record&lt;string, ToolEffects&gt;&gt;</code> 是<strong>一张工具名 → 副作用的注册表</strong>，每个工具都必须登记。</li>
+<li>关键在 <code>DerivedToolAnnotations</code>（L25–L29）：<code>readOnlyHint</code> / <code>destructiveHint</code> / <code>idempotentHint</code> / <code>openWorldHint</code> <strong>只从 canonical effects 推导</strong>，不允许手写。</li>
+</ul>
+<p>分析时点：PEA 的 <code>mcp/tool-contract.json</code> 只有手写的 <code>side_effects</code> 字段，没有"从实现元数据生成"的机制——文档自己要求"ToolEffects 和 availability 必须从实现元数据生成"，正是这条。</p>
+<p><strong>验收</strong>：新增工具未登记 effects → CI 失败；手写的 MCP 注解与 effects 推导结果不一致 → CI 失败。</p>
+<h3>3. 结构化错误合同（对应 PEA 现有 exit code 的替代）</h3>
+<p><code>docs/error-contract.schema.json</code>（747 行）定义了统一错误信封：<code>code</code> + <code>category</code>（枚举 10 类：<code>invalid_input</code> / <code>unsupported_provider</code> / <code>unsupported_target</code> / <code>integrity_mismatch</code> / <code>truncated</code> / <code>cancelled</code> / <code>timeout</code> / <code>resource_constraint</code> / <code>unavailable</code> / <code>execution_failure</code>）+ <code>retryable</code> + <code>remediation.action</code>。</p>
+<p>PEA 现在用 <code>exit 2</code>（异常）/ <code>exit 3</code>（无结果）/ <code>exit 4</code>（blocked）三个裸码，<strong>无法区分"用户输入非法"与"策略阻断"</strong>——这正是我在边界测试里发现的问题（非法 goal 被当成 blocked 处理）。</p>
+<p><strong>验收</strong>：<code>goals</code> 非法 → <code>invalid_input</code>；授权未确认 → 另一类；两者错误码与退出码都不重叠。</p>
+<h3>4. Unknown 是一等公民，不是兜底（对应 PEA-050 / 全局 DoD）</h3>
+<p>REA 为此做了三件事，PEA 在分析时点一件都没有（<strong>现状（0.7.0）已落地前三件</strong>：<code>ledger.py</code> 证据账本 + <code>pea.ledger_*</code> 六工具 + <code>audit_residual_unknowns</code> 随 verified 门机械返回，未知项是一等公民）：</p>
+<ul>
+<li><code>src/application/investigation/EvidenceLedger.ts</code> — 证据账本</li>
+<li><code>src/domain/unknownRegistryError.ts</code> — unknown 的注册与错误类型</li>
+<li><code>list_unknowns</code> 工具（见 <code>src/contracts/sessionToolContracts.ts</code>）— <strong>把"还不知道什么"作为可查询的接口暴露给调用方</strong></li>
+</ul>
+<p><code>docs/mcp-contracts.md</code> 里把语义写得非常清楚，值得直接纳入 PEA 的设计原则：</p>
+<blockquote>
+<p><code>complete</code> means that set was returned without a known read limit; it does not claim every possible runtime edge.
+Missing coverage remains <code>unknown</code>.
+An empty call list with partial or unknown coverage is <strong>not proof</strong> that the function has no calls.</p>
+</blockquote>
+<p><strong>验收</strong>：报告里必须有 <code>unknowns</code> 数组，且空结果/工具失败/未运行三者必须可区分，不能都写成"未发现问题"。</p>
+<h3>5. 不可信目标内容处理（对应 PEA 的威胁模型 §7）</h3>
+<p><code>docs/mcp-contracts.md</code> 的 "Untrusted target content" 一节明确：字符串、符号、反编译代码、页面文本、脚本体、网络捕获、日志、文件清单<strong>全部来自被分析目标</strong>，目标可以嵌入"看起来像给 agent 的指令"的文本。REA 的处理是：当数据看，且结果 <code>_meta</code> 带稳定标记告知调用方"这段内容不可信"。</p>
+<p>PEA <code>docs/Threat-Model-and-Security-Policy-zh-CN.md</code> §7 已经写了同样的原则（README/注释/工具输出都是数据，不是指令），分析时点<strong>尚未落到实现</strong>。<strong>现状（0.7.0）</strong>：只读域已落地且从不执行目标内容；但把"疑似指令"显式标注为 prompt-injection 尝试的机制<strong>仍未实现</strong>——如实保留为待办。M3 做只读扫描器时这是必须同步实现的——因为扫描器读的正是这些不可信文本。</p>
+<p><strong>验收</strong>：扫描结果里来自目标文件的内容必须带不可信标记；命中"疑似指令"只报告为 prompt-injection 尝试，不执行。</p>
+<h3>6. Composition Root（对应 PEA-030，CLI/MCP 共用 service layer）</h3>
+<p><code>src/composition/</code> 的职责是"fresh typed provider and session factories, one-shot binding"——CLI 和 MCP 两个入口都<strong>只依赖 composition</strong>，不直接碰 provider。</p>
+<p>分析时点：<code>cli.py</code> 直接 import <code>planner.py</code>，等 MCP server 加进来极易出现两套逻辑。<strong>已落地</strong>：组合层 <code>mcpserver.call_tool</code> 是 CLI 与 MCP 共用的 service layer（审批强制、授权根检查、命名拒绝同源），<code>pea protect</code> 与四个执行器都走它。</p>
+<p><strong>验收</strong>：同一输入在 CLI 与 MCP 下产出完全相同的 plan/evidence 字段（PEA-030 原话）。</p>
+<hr />
+<h2>三、工具形态分类法（可直接用于 PEA 的工具命名）</h2>
+<p><code>docs/tool-design.md</code> 给出 7 种任务形态，比 PEA 现在按"动作"命名更稳：</p>
+<table>
+<thead>
+<tr>
+<th>形态</th>
+<th>用途</th>
+<th>映射到 PEA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inspect</code></td>
+<td>关于单个目标/对象/资源的事实</td>
+<td><code>pea.inspect_candidate</code>、制品审计</td>
+</tr>
+<tr>
+<td><code>search</code> / <code>list</code></td>
+<td>候选发现</td>
+<td><code>pea.search_catalog</code>、<code>pea.list_unknowns</code></td>
+</tr>
+<tr>
+<td><code>trace</code></td>
+<td>跨证据的关系</td>
+<td>调用链/依赖追踪</td>
+</tr>
+<tr>
+<td><code>compare</code></td>
+<td>显式配对的工件对比</td>
+<td><code>pea.compare_results</code></td>
+</tr>
+<tr>
+<td><code>workflow</code></td>
+<td>需要组合的周期性结果</td>
+<td>保护计划编排</td>
+</tr>
+<tr>
+<td><code>observe</code> / <code>capture</code></td>
+<td>运行时行为</td>
+<td>动态测试（需单独审批）</td>
+</tr>
+</tbody>
+</table>
+<p>同一条文档还给了 PEA 最该记住的一句：</p>
+<blockquote>
+<p>A plan without execution does not establish runtime behavior.（没有执行的计划不能证明运行时行为）</p>
+</blockquote>
+<p>这与 PEA 自己"不把构建成功当安全成功"完全一致。</p>
+<hr />
+<h2>四、对落地路线的修正建议</h2>
+<p>结合上一轮分析报告，基于本次拿到源码的事实，对里程碑做三处调整：</p>
+<table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>原计划</th>
+<th>修正</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M1 契约优先</strong></td>
+<td>引入 jsonschema 校验</td>
+<td>拆成两步：先对齐 REA 的<strong>结构化错误合同</strong>形态（<code>code</code>+<code>category</code>+<code>retryable</code>+<code>remediation</code>），再做 Schema 强校验。否则修完校验还是分不清"输入非法"和"策略阻断"</td>
+</tr>
+<tr>
+<td><strong>M3 只读扫描器</strong></td>
+<td>4 天，纯功能</td>
+<td><strong>追加不可信内容标记 + unknowns 输出</strong>，这部分必须和扫描能力同批做，后补成本高得多</td>
+</tr>
+<tr>
+<td><strong>M4 MCP 骨架</strong></td>
+<td>4 天</td>
+<td><strong>前置 0.5 天建 composition 层</strong>；并移植 <code>TOOL_EFFECTS</code> 注册表 + 派生注解的设计，这是 PEA-031 的验收核心</td>
+</tr>
+</tbody>
+</table>
+<p>另有两项本次确认<strong>暂不可行</strong>，应明确移出近期范围：
+- 直接构建/测试 REA 本体（需 <code>npm install</code> + 5 个 submodule，其中 Ghidra/binwalk/unblob 体积巨大且部分需要厂商工具）——只读审计不需要。
+- ShellVMP / FDartVMP 的源码审计：本次未拉取，仍维持 <code>documentation_reviewed</code>，不要因为 REA 拉成功就一并升级状态。</p>
+<hr />
+<h2>五、已同步修正的过期记录</h2>
+<p>PEA 早期文档记载"本执行容器无法解析 <code>github.com</code>，clone 失败"，并据此把 REA 的研究状态封顶在 <code>documentation_reviewed</code>。该前提在当前沙箱已不成立，已更新：</p>
+<ul>
+<li><code>/workspace/references/PROVENANCE.md</code> — 新增，记录镜像来源、commit SHA、完整性校验方式、未完成项</li>
+<li>下载包内的 <code>PEA-Design-Kit/sources.md</code>（对应本仓库 <code>sources.md</code>）— 更新"REA 审计状态"段</li>
+<li>下载包内的 <code>PEA-Design-Kit/README.md</code>（对应本仓库 <code>README_zh.md</code>）— 更新"状态与限制"段</li>
+</ul>
+<p>按项目自己的原则（未知就标 unknown，不用猜测填充），现在应该写成：<strong>源码已取得、commit 已固定；<code>source_reviewed</code> 的行号级审计待执行，不得越级写成 <code>fixture_verified</code></strong>。</p></main></body></html>

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/field-response.schema.json",
+  "title": "PEA Field Response Plan",
+  "description": "战场响应计划（D7）：破解样本到达后的服务端移动球门方案。红线入合同——中性失效（服务器不再配合破解包，不触碰攻击者设备）、不误杀合法用户（负向测试必含合法变体无伤）、仅对有服务端姿态可用（纯离线应用在计划推导时挡掉）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "response_id", "created_at", "posture", "incident", "measures", "negative_tests", "red_lines", "limitations"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "response_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "plan_id": {"type": "string", "description": "来源保护计划的 plan_id，供审计追溯。"},
+    "posture": {
+      "type": "string",
+      "enum": ["server_side_available", "declined_offline_only"],
+      "description": "server_side_available=有服务端姿态，可规划球门轮换；declined_offline_only=纯离线应用，本机制不可用（计划被挡下，不是空计划）。"
+    },
+    "incident": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cracked_path", "baseline_path", "changed_artifacts"],
+      "properties": {
+        "cracked_path": {"type": "string", "minLength": 1},
+        "baseline_path": {"type": "string", "minLength": 1},
+        "changed_artifacts": {"type": "integer", "minimum": 0, "description": "与原版 manifest diff 出的改动产物数。"},
+        "changed_paths": {"type": "array", "items": {"type": "string"}, "description": "改动产物路径（modified/added/removed）。"}
+      }
+    },
+    "measures": {
+      "type": "array",
+      "description": "响应措施。空数组仅在 declined_offline_only 时允许。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["measure_id", "kind", "target", "rationale", "impact_scope", "rollout"],
+        "properties": {
+          "measure_id": {"type": "string", "minLength": 1},
+          "kind": {
+            "type": "string",
+            "enum": ["server_side_goalpost_move", "challenge_rotation", "protocol_rotation", "attestation_tightening"],
+            "description": "全部是服务端动作：轮换只有仍保有并执行原始逻辑的客户端才能应答的挑战/协议/校验规则。不包含任何往破解包推送代码的措施。"
+          },
+          "target": {"type": "string", "minLength": 1, "description": "轮换对象（如 license_challenge_v2、校验规则集）。"},
+          "rationale": {"type": "string", "minLength": 1, "description": "为什么轮换这个——破解者剥掉了什么，就轮换什么。"},
+          "impact_scope": {"type": "string", "minLength": 1, "description": "影响面：哪些客户端行为会改变。"},
+          "rollout": {"type": "string", "enum": ["gray", "full"], "description": "灰度策略；新规则先灰度，负向测试通过后才全量。"},
+          "trigger_artifact": {"type": "string", "description": "触发本措施的改动产物路径（来自 intake diff）。"}
+        }
+      }
+    },
+    "negative_tests": {
+      "type": "array",
+      "minItems": 1,
+      "description": "生效前必须通过的负向测试；'合法变体不受影响'是红线，不可省略。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test_id", "scenario", "expectation"],
+        "properties": {
+          "test_id": {"type": "string", "minLength": 1},
+          "scenario": {"type": "string", "enum": ["cracked_variant_fails", "legitimate_variant_unaffected", "offline_client_degrades_gracefully"]},
+          "expectation": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "red_lines": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "unknowns": {"type": "array", "items": {"type": "string"}}
+  }
+}

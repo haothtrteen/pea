@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.invalid/schemas/research-candidate-review.schema.json",
+  "title": "PEA Research Candidate Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "source_url",
+    "review_state",
+    "reviewed_at",
+    "commit_sha",
+    "source_audit",
+    "license_review",
+    "fixture_test",
+    "claims",
+    "limitations",
+    "decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "commit_sha": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "release_or_tag": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "review_state": {
+      "enum": [
+        "discovered",
+        "documentation_reviewed",
+        "source_reviewed",
+        "test_reviewed",
+        "fixture_verified",
+        "project_verified",
+        "production_eligible",
+        "blocked",
+        "unknown"
+      ]
+    },
+    "source_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_attempted",
+            "failed_to_fetch",
+            "partial",
+            "completed"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "reviewed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "license_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_license",
+        "status",
+        "notes"
+      ],
+      "properties": {
+        "reported_license": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "not_reviewed",
+            "needs_legal_review",
+            "compatible_for_current_scope",
+            "incompatible",
+            "unknown"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "third_party_dependencies_reviewed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "fixture_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "test_scope",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "passed",
+            "failed",
+            "partial",
+            "unknown"
+          ]
+        },
+        "test_scope": {
+          "type": "string"
+        },
+        "command_or_test_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim",
+          "claim_status",
+          "evidence_url",
+          "limitations"
+        ],
+        "properties": {
+          "claim": {
+            "type": "string"
+          },
+          "claim_status": {
+            "enum": [
+              "external_claim",
+              "observed_in_source",
+              "reproduced_in_fixture",
+              "unknown"
+            ]
+          },
+          "evidence_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "path_and_lines": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decision": {
+      "enum": [
+        "research_only",
+        "candidate_for_fixture",
+        "blocked",
+        "eligible_for_project_review",
+        "production_eligible"
+      ]
+    },
+    "reviewer_notes": {
+      "type": "string"
+    }
+  }
+}

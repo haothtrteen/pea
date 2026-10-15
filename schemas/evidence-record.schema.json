@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.invalid/schemas/evidence-record.schema.json",
+  "title": "PEA Evidence Record",
+  "type": "object",
+  "required": ["evidence_id", "kind", "source", "observed_at", "authority", "limitations"],
+  "properties": {
+    "evidence_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["file_observation", "tool_output", "test_result", "source_document", "hash", "human_review", "inference"]},
+    "source": {"type": "string"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "tool_name": {"type": ["string", "null"]},
+    "tool_version": {"type": ["string", "null"]},
+    "commit_or_release": {"type": ["string", "null"]},
+    "artifact_digest": {"type": ["string", "null"]},
+    "location": {"type": ["string", "null"]},
+    "authority": {"enum": ["observation", "inference", "external_claim", "human_assertion"]},
+    "coverage_state": {"enum": ["complete_for_scope", "partial", "unavailable", "not_run", "unknown"]},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "content_digest": {"type": ["string", "null"]},
+    "redacted_summary": {"type": ["string", "null"]},
+    "environment": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "观察发生时的环境分层上下文（第三环 T0-T4，见 docs/Attack-Verification-and-Field-Feedback-Design-zh-CN.md §3）。缺失即未声明，不得由工具推断。",
+      "required": ["environment_tier"],
+      "properties": {
+        "environment_tier": {"enum": ["T0", "T1", "T2", "T3", "T4", "unknown"], "description": "T0 纯静态 / T1 桌面全权限 / T2 root 模拟器 / T3 root 真机 / T4 硬件级；环境缺失记 unknown，不是 fail。"},
+        "environment_note": {"type": "string", "description": "环境事实注记（如 adb 设备型号、容器镜像）；不复述推测。"},
+        "variant": {"type": ["string", "null"], "description": "源码作弊码变体构建说明（如 detection-disabled）；null 或缺失 = 原始构建。"},
+        "device": {"type": ["string", "null"], "description": "执行观察的设备/模拟器标识；禁止登记生产设备。"}
+      }
+    }
+  },
+  "additionalProperties": false
+}

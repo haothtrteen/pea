@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fffefa">
+<meta name="description" content="PEA（Protection Engineering Assistant）：面向自有或获授权软件项目的保护研究、方案规划、受控集成与证据验证。">
+<meta property="og:title" content="PEA — Protection Engineering Assistant">
+<meta property="og:description" content="把软件保护，变成可验证的工程。研究方案、识别暴露面、规划保护措施，并用证据验证结果。">
+<title>PEA — Protection Engineering Assistant</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#fffefa; --surface:#f7f8f3; --surface-2:#eef4ee; --ink:#202822;
+  --muted:#5e6961; --subtle:#778178; --line:#dfe5dd; --accent:#2d694e;
+  --accent-strong:#21563e; --accent-soft:#e2efe5; --warm:#b9502f; --warm-soft:#f8e9e1;
+  --code:#f4f6f1; --code-ink:#27352c; --focus:#b9502f; --shadow:0 1px 0 rgba(20,40,26,.03);
+  --page-width:1180px; --content-width:800px;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#1e231f; --surface:#252c27; --surface-2:#273b2e; --ink:#e3e9e2;
+  --muted:#b0bbb1; --subtle:#95a396; --line:#3c4940; --accent:#9ad0ab;
+  --accent-strong:#b9e5c5; --accent-soft:#2a4131; --warm:#f0a082; --warm-soft:#453027;
+  --code:#171d19; --code-ink:#e0e9df; --focus:#f0a082; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:82px}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.68;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:underline;text-decoration-thickness:.07em;text-underline-offset:.18em}
+a:hover{color:var(--warm)}
+button,select,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{width:min(var(--page-width),calc(100% - 40px));margin-inline:auto}
+.site-header{border-bottom:1px solid var(--line);background:var(--page)}
+.header-inner{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:790;letter-spacing:-.035em;white-space:nowrap}
+.brand-mark{width:29px;height:29px;border:2px solid var(--accent);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:15px;font-weight:850;line-height:1}
+.brand-word{font-size:18px}.brand-sub{font-size:10px;letter-spacing:.075em;font-weight:620;color:var(--muted);margin-left:2px}
+.header-links{display:flex;align-items:center;gap:22px;font-size:13px;white-space:nowrap}
+.header-links a{color:var(--ink);text-decoration:none}.header-links a:hover{color:var(--accent)}
+.header-tools{display:flex;align-items:center;gap:8px}
+.icon-button{height:36px;min-width:36px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);display:inline-grid;place-items:center;padding:0 9px;font-size:13px}
+.layout{display:grid;grid-template-columns:170px minmax(0,var(--content-width)) 1fr;gap:42px;align-items:start;padding-top:26px}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 36px);overflow:auto;font-size:12px;padding:8px 0 20px}
+.toc-title{font-weight:760;margin:0 0 10px;color:var(--ink)}
+.toc a{display:block;text-decoration:none;color:var(--muted);padding:5px 9px;border-left:2px solid transparent;line-height:1.45}
+.toc a:hover,.toc a[aria-current="location"]{color:var(--accent);border-left-color:var(--accent);background:var(--surface)}
+.toc .toc-nested{padding-left:17px;font-size:11px}
+main{min-width:0;max-width:var(--content-width)}
+.hero{padding:26px 0 36px}
+.eyebrow{font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.015em}
+.hero h1{font-size:clamp(38px,5vw,52px);line-height:1.13;letter-spacing:-.055em;max-width:700px;margin:0 0 15px;font-weight:780}
+.hero h1 .accent{color:var(--accent)}
+.lead{font-size:17px;line-height:1.7;color:var(--muted);max-width:700px;margin:0 0 20px}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:17px;font-size:14px}
+.link-button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent);border-radius:6px;padding:7px 12px;background:var(--accent);color:#fff;text-decoration:none;font-weight:680;min-height:39px}
+html[data-theme="dark"] .link-button{color:#15251a}
+.link-button:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:#fff;text-decoration:none}
+.text-link{font-weight:640}
+.hero-note{font-size:12px;color:var(--muted);margin-top:16px}
+.section{border-top:1px solid var(--line);padding:30px 0 34px;scroll-margin-top:80px}
+.section h2{font-size:27px;line-height:1.25;letter-spacing:-.035em;margin:0 0 9px;font-weight:760}
+.section h3{font-size:19px;line-height:1.35;letter-spacing:-.018em;margin:0 0 8px}
+.section p{margin:8px 0 14px}
+.section-intro{color:var(--muted);max-width:740px;margin-top:0!important}
+.small-label{font-size:12px;color:var(--muted);font-weight:690;margin-bottom:6px}
+.prompt-label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin:18px 0 6px}
+.code-panel{background:var(--code);border:1px solid var(--line);border-radius:7px;padding:13px 15px;overflow:auto;color:var(--code-ink);font:13px/1.68 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.code-head{font-size:11px;color:var(--muted);font-family:inherit;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.copy-button{border:1px solid var(--line);border-radius:5px;background:var(--page);color:var(--ink);padding:4px 9px;font-size:12px;font-weight:650;min-height:31px;white-space:nowrap}
+.copy-button:hover{border-color:var(--accent);color:var(--accent)}
+.inline-code{font: .92em ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.1em .35em}
+.note{font-size:12px;color:var(--muted);border-left:3px solid var(--warm);padding:5px 0 5px 12px;margin:14px 0}
+.definition{padding:14px 17px;border-left:3px solid var(--accent);background:var(--surface);margin:16px 0}
+.definition strong{display:block;margin-bottom:4px}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
+.compare-col{min-width:0}
+.compare-title{font-size:12px;color:var(--muted);font-weight:760;letter-spacing:.025em;margin-bottom:8px}
+.numbered{list-style:none;margin:0;padding:0;counter-reset:task}
+.numbered li{position:relative;counter-increment:task;padding:0 0 13px 34px;margin:0 0 12px;border-bottom:1px solid var(--line);font-size:14px}
+.numbered li:before{content:counter(task,decimal-leading-zero);position:absolute;left:0;top:1px;color:var(--warm);font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.numbered li:last-child{border-bottom:0}
+.evidence-card{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:13px 14px;margin-top:10px}
+.evidence-card h4{font-size:13px;margin:0 0 8px}
+.evidence-row{display:grid;grid-template-columns:112px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:12px}
+.evidence-row strong{font-weight:700}.evidence-row span{color:var(--muted)}
+.callout{margin:18px 0 0;padding:12px 14px;background:var(--accent-soft);border-radius:6px;font-size:13px}
+.callout strong{color:var(--accent)}
+.figure-caption{font-size:11px;color:var(--muted);margin:9px 0 0!important}
+.example-intro{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:16px}
+.meta-block{font-size:13px}.meta-block strong{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.demo{border:1px solid var(--line);border-radius:7px;padding:15px;background:var(--surface);margin:14px 0}
+.demo-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.demo-tag{font-size:11px;font-weight:760;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.demo-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.demo-controls label{font-size:12px;color:var(--muted);font-weight:650}
+.demo-controls select{max-width:100%;padding:7px 29px 7px 9px;border:1px solid var(--line);border-radius:5px;background:var(--page);color:var(--ink);font-size:13px}
+.result-heading{font-size:13px;font-weight:760;margin:14px 0 4px}
+.plan-result{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:10px}
+.result-box{padding:10px 12px;background:var(--page);border:1px solid var(--line);border-radius:5px}
+.result-box strong{font-size:12px;display:block;margin-bottom:5px;color:var(--accent)}
+.result-box ul{padding-left:18px;margin:0;font-size:12px;color:var(--muted)}.result-box li{margin:3px 0}
+.steps-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:18px 0}
+.step-box{padding:12px 11px;border:1px solid var(--line);border-right:0;background:var(--surface);min-width:0}
+.step-box:first-child{border-radius:6px 0 0 6px}.step-box:last-child{border-right:1px solid var(--line);border-radius:0 6px 6px 0}
+.step-box .step-num{font-size:11px;font-weight:800;color:var(--warm)}.step-box b{display:block;font-size:13px;margin:3px 0}.step-box span:last-child{display:block;font-size:11px;color:var(--muted);line-height:1.45}
+.tabs{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.tab{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:5px;padding:6px 10px;font-size:12px;font-weight:650}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-theme="dark"] .tab[aria-selected="true"]{color:#15251a}
+.audit-list{list-style:none;padding:0;margin:12px 0 0}
+.audit-list li{display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.audit-list li:last-child{border-bottom:0}.status-mark{color:var(--warm);font-weight:850}.audit-list small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.status-label{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:2px 5px;white-space:nowrap}
+.prompt-example{border:1px solid var(--line);border-radius:7px;padding:13px 14px;margin:13px 0;background:var(--page)}
+.prompt-example p{font-size:13px;margin:8px 0}.prompt-example .quote{border-left:2px solid var(--accent);padding:1px 0 1px 11px;color:var(--muted)}
+.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+.guide-card{padding:13px 0 12px;border-top:2px solid var(--accent);min-width:0}
+.guide-card h3{font-size:16px;margin:5px 0}.guide-card p{font-size:12px;color:var(--muted);margin:6px 0 9px}.guide-card a{font-size:12px;font-weight:650}
+.faq-item{border-top:1px solid var(--line);padding:12px 0}.faq-item:last-child{border-bottom:1px solid var(--line)}
+.faq-item summary{font-size:14px;font-weight:720;cursor:pointer}.faq-item p{font-size:13px;color:var(--muted);margin:10px 0 4px}
+.dual-direction{display:grid;grid-template-columns:1fr 34px 1fr;align-items:stretch;gap:10px;margin:17px 0}
+.direction-card{padding:13px 14px;border:1px solid var(--line);border-radius:6px}.direction-card .direction-name{font-weight:800;font-size:14px}.direction-card p{font-size:12px;color:var(--muted);margin:6px 0 0}.direction-arrow{display:grid;place-items:center;color:var(--warm);font-size:22px;font-weight:800}
+.community{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:17px;margin:15px 0 30px}
+.community h3{margin-bottom:4px}.community p{font-size:13px;color:var(--muted)}
+.site-footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:11px;color:var(--muted)}
+.footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.footer-links{display:flex;gap:14px;flex-wrap:wrap}
+.toast{position:fixed;z-index:30;left:50%;bottom:20px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--ink);color:var(--page);border-radius:6px;padding:8px 13px;font-size:12px;transition:opacity .18s,transform .18s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.back-top{position:fixed;right:18px;bottom:18px;background:var(--page);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 11px;text-decoration:none;font-size:12px;opacity:0;pointer-events:none;transition:opacity .15s}.back-top.visible{opacity:1;pointer-events:auto}
+.mobile-toc{display:none}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+@media(max-width:1050px){.layout{grid-template-columns:145px minmax(0,1fr);gap:26px}.layout:after{display:none}.header-links{gap:14px}.brand-sub{display:none}}
+@media(max-width:760px){.wrap{width:calc(100% - 30px)}.header-inner{min-height:58px}.header-links{gap:13px}.header-links a:nth-child(n+3){display:none}.layout{display:block;padding-top:0}.toc{display:none}.mobile-toc{display:block;position:sticky;top:0;z-index:20;background:var(--page);border-bottom:1px solid var(--line);margin:0 -15px;padding:0 15px}.mobile-toc summary{cursor:pointer;list-style:none;font-size:12px;font-weight:700;padding:10px 0;color:var(--muted)}.mobile-toc summary::-webkit-details-marker{display:none}.mobile-toc nav{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;padding-bottom:10px}.mobile-toc a{font-size:12px;text-decoration:none;padding:5px 0}.hero{padding-top:27px}.hero h1{font-size:40px}.lead{font-size:16px}.section{padding:26px 0 30px}.section h2{font-size:24px}.comparison{grid-template-columns:1fr;gap:20px}.example-intro{grid-template-columns:1fr;gap:7px}.guide-grid{grid-template-columns:1fr}.steps-strip{grid-template-columns:1fr 1fr;gap:0}.step-box{border-right:1px solid var(--line);border-radius:0!important}.step-box:nth-child(1){border-radius:6px 0 0 0!important}.step-box:nth-child(2){border-radius:0 6px 0 0!important}.step-box:nth-child(3){border-radius:0 0 0 6px!important}.step-box:nth-child(4){border-radius:0 0 6px 0!important}.plan-result{grid-template-columns:1fr}.dual-direction{grid-template-columns:1fr;gap:8px}.direction-arrow{transform:rotate(90deg)}.footer-inner{display:block}.footer-links{margin-top:9px}}
+@media(max-width:420px){.brand-word{font-size:17px}.header-links{display:none}.hero h1{font-size:36px}.hero-actions{gap:10px}.evidence-row{grid-template-columns:90px 1fr}.audit-list li{grid-template-columns:20px 1fr}.status-label{grid-column:2;justify-self:start}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body id="top">
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="PEA 首页"><span class="brand-mark">P</span><span class="brand-word">PEA</span><span class="brand-sub">PROTECTION ENGINEERING ASSISTANT</span></a>
+    <nav class="header-links" aria-label="主导航"><a href="#setup">开始使用</a><a href="#examples">案例</a><a href="#guides">指南</a><a href="#faq">FAQ</a></nav>
+    <div class="header-tools"><button class="icon-button" id="themeToggle" type="button" aria-label="切换深色模式" title="切换浅色 / 深色模式">◐</button><a class="link-button" href="#setup">开始使用 →</a></div>
+  </div>
+</header>
+<div class="wrap layout">
+  <aside class="toc" aria-label="页面目录">
+    <p class="toc-title">本页目录</p>
+    <a href="#setup">开始使用 PEA</a>
+    <a href="#what-is">什么是保护工程？</a>
+    <a href="#how-it-helps">PEA 如何帮助你</a>
+    <a class="toc-nested" href="#native-example">案例 01 · 原生代码</a>
+    <a class="toc-nested" href="#artifact-example">案例 02 · 发布产物</a>
+    <a href="#first-exercise">第一次尝试</a>
+    <a href="#guides">深入了解</a>
+    <a href="#faq">常见问题</a>
+    <a href="#community">项目与社区</a>
+  </aside>
+  <details class="mobile-toc"><summary>本页目录　⌄</summary><nav aria-label="移动端页面目录"><a href="#setup">开始使用 PEA</a><a href="#what-is">什么是保护工程？</a><a href="#how-it-helps">PEA 如何帮助你</a><a href="#native-example">案例 01 · 原生代码</a><a href="#artifact-example">案例 02 · 发布产物</a><a href="#first-exercise">第一次尝试</a><a href="#guides">深入了解</a><a href="#faq">常见问题</a></nav></details>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="eyebrow">和你的编程助手一起做软件保护工程</div>
+      <h1 id="hero-title">让软件保护，<br><span class="accent">成为可验证的工程。</span></h1>
+      <p class="lead">PEA 帮助你研究已有保护方案、识别发布产物的暴露面，并制定可以审阅和验证的保护计划。先弄清风险，再选择措施；不把“加壳成功”误当成“保护有效”。</p>
+      <div class="hero-actions"><a class="link-button" href="#how-it-helps">看看 PEA 如何工作 ↓</a><a class="text-link" href="#guides">浏览保护指南 →</a><a class="text-link" href="#examples">查看示例 →</a></div>
+      <p class="hero-note">独立项目 · 聚焦软件工程的另一面：保护，而不是逆向还原。</p>
+      <div class="dual-direction" aria-label="REA 与 PEA 的方向对照">
+        <div class="direction-card"><div class="direction-name">REA · Reverse Engineering Assistant</div><p>检查程序，理解它是如何工作的。</p></div>
+        <div class="direction-arrow" aria-hidden="true">↔</div>
+        <div class="direction-card"><div class="direction-name">PEA · Protection Engineering Assistant</div><p>评估暴露面，规划如何提高分析与篡改成本。</p></div>
+      </div>
+      <p class="figure-caption">方向对照用于说明项目定位。PEA 是独立项目，不隶属于 REA，也不代表双方存在官方合作关系。</p>
+    </section>
+
+    <section class="section" id="setup">
+      <h2>开始使用 PEA</h2>
+      <p class="section-intro">你可以先把保护需求交给编程助手，要求它先提交研究与规划结果，得到确认后再进入任何会修改工程的步骤。</p>
+      <div class="prompt-label"><span>把这段话复制给你的编程助手</span><button class="copy-button" data-copy="请使用 PEA 的保护工程方法审阅我拥有或获授权测试的项目。先明确资产、威胁模型和部署边界，再研究已有方案并核验来源、许可证、维护状态、平台兼容性与测试证据。先给我一份带理由、风险、验证步骤和未知项的计划；不要安装依赖、访问网络、执行第三方工具或修改项目，等我明确批准后再继续。">复制提示词</button></div>
+      <div class="code-panel" id="setupPrompt">请使用 PEA 的保护工程方法审阅我拥有或获授权测试的项目。先明确资产、威胁模型和部署边界，再研究已有方案并核验来源、许可证、维护状态、平台兼容性与测试证据。先给我一份带理由、风险、验证步骤和未知项的计划；不要安装依赖、访问网络、执行第三方工具或修改项目，等我明确批准后再继续。</div>
+      <div class="prompt-label"><span>运行本地原型（源码方式，无需安装）</span><button class="copy-button" data-copy="python -m pea.cli demo --request examples/protection-request.flutter-licensing.example.json --project demo/canary-flutter-licensing --out build/demo-out">复制命令</button></div>
+      <div class="code-panel"><div class="code-head"><span>在 PEA-Design-Kit 项目根目录运行</span><span>Python 3.10+ · 零第三方依赖</span></div><code>python -m pea.cli demo --request examples/protection-request.flutter-licensing.example.json --project demo/canary-flutter-licensing --out build/demo-out</code></div>
+      <p class="note">当前原型是一条端到端流水线：只读侦察（项目画像 / 产物清单 / 秘密扫描 / 字符串符号 / native 结构 / Dart 快照 / 构建集成 / 环境侦察八个域）→ 暴露面分层 → 计划生成 → 任务简报（沙盘到实弹的交接面）→ 攻击自测设计 → 证据账本 → verified 门禁 → 脱敏报告；破解包回来后还有战场反馈回路（diff 入账 + 服务端球门轮换）。它对授权目录做真实只读扫描，但不执行目标程序、不安装保护器、不改写工程。上面的提示词是工作流模板，不是自动安装器。</p>
+    </section>
+
+    <section class="section" id="what-is">
+      <h2>什么是软件保护工程？</h2>
+      <p>软件保护工程，是根据软件资产、威胁模型和部署方式选择防护措施，再用测试证据检查它们带来的变化。它不等于把每个功能都混淆一遍，也不承诺让软件永远无法被分析。</p>
+      <div class="definition"><strong>一个实际问题：为什么桌面应用里的核心算法会被恢复？</strong>因为程序交付到用户设备后，二进制、符号、常量、控制流和运行行为都可能成为分析线索。保护设计应该从这些暴露面出发，而不是从某种工具的名字出发。</div>
+      <div class="comparison">
+        <div class="compare-col"><div class="compare-title">没有 PEA · 你自己逐项调查</div>
+          <ol class="numbered"><li>确认核心资产在哪些模块里，以及是否必须随客户端发布。</li><li>分别搜索混淆器、虚拟化方案或编译器功能，手工核验许可证和兼容性。</li><li>自己设计回归测试，判断保护后的行为、性能和包体积是否变化。</li></ol>
+          <div class="evidence-card"><h4>需要人工整理的线索</h4><div class="evidence-row"><strong>Symbols</strong><span>发布产物是否留下可读符号？</span></div><div class="evidence-row"><strong>Constants</strong><span>敏感字符串或配置是否直接嵌入？</span></div><div class="evidence-row"><strong>Trust boundary</strong><span>关键决策是否完全依赖客户端？</span></div></div>
+        </div>
+        <div class="compare-col"><div class="compare-title">使用 PEA · 先提出一个问题</div>
+          <div class="prompt-example"><div class="small-label">示例 prompt · C++ 核心算法</div><div class="quote">“请评估我自己的 C++ 桌面应用中，哪些信息可能从发布二进制中恢复。比较服务端迁移、符号裁剪、混淆和受限虚拟化，说明许可证、兼容性、性能代价和如何验证。先计划，不要改文件。”</div></div>
+          <div class="evidence-card"><h4>PEA 规划结果应回答</h4><div class="evidence-row"><strong>暴露面</strong><span>哪些资产在客户端，哪些风险只是推测。</span></div><div class="evidence-row"><strong>方案理由</strong><span>为什么优先考虑某项措施，以及放弃了什么。</span></div><div class="evidence-row"><strong>验证证据</strong><span>需要哪些回归、差分、性能和产物检查。</span></div></div>
+        </div>
+      </div>
+      <p class="figure-caption">页面内的流程与结果为教学设计；可下载的原型会对授权目录做真实的只读扫描（证据入库、未知项显式记录），但不执行目标程序，也没有把示例发现伪装成你的扫描结果。</p>
+    </section>
+
+    <section class="section" id="how-it-helps">
+      <h2>PEA 如何帮助你</h2>
+      <p class="section-intro">把一个模糊的“帮我加固软件”请求，转成可以复核的工程任务。</p>
+      <div class="steps-strip" aria-label="PEA 保护工作流">
+        <div class="step-box"><span class="step-num">01</span><b>界定目标</b><span>资产、平台、威胁、预算</span></div>
+        <div class="step-box"><span class="step-num">02</span><b>研究方案</b><span>来源、许可、维护、证据</span></div>
+        <div class="step-box"><span class="step-num">03</span><b>提交计划</b><span>适用边界、代价、审批</span></div>
+        <div class="step-box"><span class="step-num">04</span><b>验证变化</b><span>正确性、性能、产物、限制</span></div>
+      </div>
+      <p>PEA 的价值不在于列出最多工具，而在于把“为什么选它、改动什么、怎么知道有效、哪里还不确定”放在同一个决策过程里。</p>
+    </section>
+
+    <section class="section" id="examples">
+      <div id="native-example">
+        <div class="small-label">案例 01 · 原生代码</div>
+        <h2>应该先保护哪一部分？</h2>
+        <div class="example-intro"><div class="meta-block"><strong>目标</strong>为自有 C++ 客户端中的高价值逻辑选择合理的保护路径。</div><div class="meta-block"><strong>为什么需要评估</strong>同一项目里，网络协议、公开算法和真正的商业秘密需要的保护措施可能完全不同。</div></div>
+        <div class="demo" id="plannerDemo">
+          <div class="demo-top"><span class="demo-tag">交互式方案示意</span><span class="small-label">示例规则，不是实时扫描</span></div>
+          <div class="demo-controls"><label for="targetType">项目类型</label><select id="targetType"><option value="native">C++ / 原生桌面程序</option><option value="electron">JavaScript / Electron</option><option value="mobile">Android / APK</option></select><label for="goalType">主要目标</label><select id="goalType"><option value="ip">降低核心逻辑暴露</option><option value="tamper">提高篡改成本</option><option value="artifact">减少发布产物泄露</option></select></div>
+          <div class="result-heading" id="planTitle">建议先检查信任边界，再比较客户端措施。</div>
+          <p id="planSummary" class="section-intro" style="font-size:13px;margin:0">如果逻辑不必在本地运行，先比较服务端迁移与客户端保护的长期成本。</p>
+          <div class="plan-result"><div class="result-box"><strong>候选路径</strong><ul id="planCandidates"><li>确认核心逻辑是否必须在客户端执行</li><li>评估服务端迁移和 API 滥用风险</li><li>仅对剩余客户端逻辑比较保护器</li></ul></div><div class="result-box"><strong>验证清单</strong><ul id="planChecks"><li>保护前后差分测试</li><li>性能与启动耗时基线</li><li>发布产物与符号检查</li></ul></div></div>
+        </div>
+        <div class="prompt-label"><span>示例 prompt · 原生程序</span><button class="copy-button" data-copy="为我自己的 C++ 桌面程序制定保护方案。先识别关键资产与信任边界，比较服务端迁移、符号裁剪、混淆和受限虚拟化。为每个候选方案列出来源、许可证、平台兼容性、性能风险及可复现的验证步骤。不要修改文件或执行工具，先等我审核计划。">复制 prompt</button></div>
+        <div class="code-panel">“为什么我的核心算法可以从发布的二进制中恢复？请给出保护方案和能证明方案有效的检查方法。”</div>
+        <p class="figure-caption">以上交互根据下拉选择展示一份教学用的候选清单，不会读取你的文件、评估二进制或调用 PEA 引擎。</p>
+      </div>
+      <hr>
+      <div id="artifact-example">
+        <div class="small-label">案例 02 · 应用发布产物</div>
+        <h2>我的应用到底暴露了什么？</h2>
+        <div class="example-intro"><div class="meta-block"><strong>目标</strong>在发布前检查应用包中不必要的调试信息、敏感配置和符号。</div><div class="meta-block"><strong>为什么需要检查</strong>不同平台的打包格式不同，暴露信号与修复方式也不同。</div></div>
+        <div class="demo">
+          <div class="demo-top"><span class="demo-tag">示例审计结果</span><span class="small-label">所有条目均为模拟数据</span></div>
+          <div class="tabs" role="tablist" aria-label="选择示例制品"><button class="tab" role="tab" aria-selected="true" data-artifact="apk">Android APK</button><button class="tab" role="tab" aria-selected="false" data-artifact="asar">Electron ASAR</button><button class="tab" role="tab" aria-selected="false" data-artifact="elf">ELF / 原生程序</button></div>
+          <div id="auditTitle" class="result-heading">Android APK · 模拟检查清单</div>
+          <ul class="audit-list" id="auditList"><li><span class="status-mark">!</span><span><strong>调试标志</strong><small>检查合并后的 manifest 是否允许调试。</small></span><span class="status-label">待检查</span></li><li><span class="status-mark">!</span><span><strong>嵌入式配置</strong><small>检查包内是否包含不应发给客户端的 API 密钥。</small></span><span class="status-label">待检查</span></li><li><span class="status-mark">i</span><span><strong>Native 符号</strong><small>核对发布包与符号文件的分发边界。</small></span><span class="status-label">需结合构建</span></li></ul>
+        </div>
+        <div class="prompt-label"><span>示例 prompt · 制品审计</span><button class="copy-button" data-copy="对我有权审计的发布产物做只读检查。针对对应格式列出调试标志、符号、源映射、敏感常量和配置风险；每项都需要文件位置、证据、置信度、修复方式和复测方法。不要执行产物、上传文件或自动修改工程。">复制 prompt</button></div>
+        <div class="code-panel">“扫描我的发布包里不应该随客户端交付的内容，并告诉我如何修复、如何复测。”</div>
+        <p class="figure-caption">本区交互仅切换预先写入页面的示例清单，不会读取文件。可下载原型中的对应域会做真实只读扫描：秘密扫描只记模式名不记内容，native 检查只读解析 ELF/PE/Mach-O 结构，且每项结论都带覆盖范围与未知项。</p>
+      </div>
+    </section>
+
+    <section class="section" id="first-exercise">
+      <h2>先在一个小项目上试试 PEA</h2>
+      <p class="section-intro">从本地目录开始：先看候选项，再生成一份不执行代码转换的规划结果，最后跑通整条证据流水线。</p>
+      <div class="callout"><strong>先下载可运行的离线原型：</strong>其中包含八个只读分析域、规划器、任务简报与战场反馈回路、证据账本、MCP 工具合同、示例请求与设计文档。解压后，在项目根目录运行下面的命令。<p style="margin:10px 0 0"><a class="link-button" href="./downloads/PEA-Design-Kit-v0.5.0.zip" download>下载 PEA Design Kit v0.5.0 ↓</a></p></div>
+      <div class="prompt-label"><span>步骤 1 · 查看本地方案目录</span><button class="copy-button" data-copy="python -m pea.cli catalog">复制命令</button></div>
+      <div class="code-panel">python -m pea.cli catalog</div>
+      <div class="prompt-label"><span>步骤 2 · 按目标与保护意图搜索</span><button class="copy-button" data-copy="python -m pea.cli search --target javascript --goal obfuscation">复制命令</button></div>
+      <div class="code-panel">python -m pea.cli search --target javascript --goal obfuscation</div>
+      <div class="prompt-label"><span>步骤 3 · 生成计划</span><button class="copy-button" data-copy="python -m pea.cli plan --request examples/protection-request.example.json --out /tmp/pea-plan.json">复制命令</button></div>
+      <div class="code-panel">python -m pea.cli plan --request examples/protection-request.example.json --out /tmp/pea-plan.json</div>
+      <div class="prompt-label"><span>步骤 4 · 跑通端到端证据流水线</span><button class="copy-button" data-copy="python -m pea.cli demo --request examples/protection-request.flutter-licensing.example.json --project demo/canary-flutter-licensing --out build/demo-out">复制命令</button></div>
+      <div class="code-panel">python -m pea.cli demo --request examples/protection-request.flutter-licensing.example.json --project demo/canary-flutter-licensing --out build/demo-out</div>
+      <div class="callout"><strong>预期结果：</strong>步骤 1–3 产出带候选方案、理由和限制的本地 JSON 计划；步骤 4 产出一份脱敏 Markdown 报告与可复现的 JSON 证据包——侦察与各域观察进入证据账本，未消解的阻塞项让 verified 门禁保持关闭。它不会替你安装保护器，也不能证明某个二进制已得到保护。</div>
+      <p>上述命令需要 PEA-Design-Kit 项目文件。请先从项目设计包解压，再在项目根目录运行；它不依赖第三方 Python 包。</p>
+    </section>
+
+    <section class="section" id="guides">
+      <h2>深入了解</h2>
+      <p class="section-intro">根据你要保护的目标来选择研究路径，而不是从某个流行的混淆器开始。</p>
+      <div class="guide-grid">
+        <article class="guide-card"><div class="small-label">01 · Native binaries</div><h3>原生二进制</h3><p>评估符号、字符串、控制流和关键逻辑的暴露，并把候选保护措施与性能预算一起比较。</p><a href="#native-example">查看原生代码案例 →</a></article>
+        <article class="guide-card"><div class="small-label">02 · JavaScript & Electron</div><h3>前端与桌面应用</h3><p>关注 source map、打包资源、配置常量、IPC 信任边界以及服务端迁移的可行性。</p><a href="#artifact-example">查看制品审计示例 →</a></article>
+        <article class="guide-card"><div class="small-label">03 · Build & validation</div><h3>构建与验证</h3><p>定义保护前后的差分测试、性能基线、回滚要求和发布产物检查，避免“构建通过就算成功”。</p><a href="#first-exercise">运行离线规划器 →</a></article>
+      </div>
+      <div class="prompt-example"><div class="prompt-label" style="margin-top:0"><span>示例 prompt · 保护研究</span><button class="copy-button" data-copy="研究适用于我当前平台与语言的成熟保护方案。只纳入有可追溯来源的候选项，并核验许可证、维护状态、兼容性、依赖风险和可验证证据；若信息未知，请标记 unknown。请比较复用与自研成本，不要自动安装或执行任何候选项目。">复制 prompt</button></div><p class="quote">“先查已有方案。如果没有真正合适的选项，再提出一个范围明确、可以逐步验证的自研路线。”</p></div>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>常见问题</h2>
+      <details class="faq-item"><summary>PEA 是 REA 的官方分支或合作项目吗？</summary><p>不是。PEA 是独立项目，借用“逆向工程 / 保护工程”这组方向对照来解释自己的定位；它与 REA 没有官方隶属或合作关系。REA 的来源请参见 <a href="https://rea.tools/" target="_blank" rel="noopener noreferrer">REA 官网</a>。</p></details>
+      <details class="faq-item"><summary>PEA 已经能自动保护任意程序了吗？</summary><p>还不能。当前原型提供：八个只读分析域（对授权目录做真实扫描，结论带覆盖范围与未知项）、暴露面分层、保护计划生成、任务简报与攻击自测设计、证据账本与 verified 门禁、战场反馈回路（破解包 diff 入账 + 服务端响应计划）、任务编排与断点恢复（`pea task` / `pea.run_assessment`，任务落盘、输入摘要恢复、失败域不假绿灯），以及 35 个 MCP 工具合同（<strong>35 个全部已接线</strong>、带审批强制）与标准 MCP stdio server（`pea mcp-server`，官方 SDK 可选依赖，协议层零豁免）。<strong>受控执行闭环已落地（0.7.0）</strong>：`pea protect &lt;项目路径&gt;` 一条命令完成分析 → 方案 → 审批预览 → 唯一人工决策（y/N）→ 在 PEA 受管工作区内执行已审阅的变换 → 独立验证（含变换有效性门：产物没变即判失败，工具退出码 0 不算证据）→ 前后差分 → 报告；配套的 JS 样板七步闭环与八条判据已机械核验。尚未提供：在线研究连接器、真正的 IR/VMP 后端、宿主确认界面，以及 Flutter / R8 / native 多平台执行。</p></details>
+      <details class="faq-item"><summary>使用混淆或虚拟化，就能阻止逆向吗？</summary><p>不能。它们通常只能提高分析成本。对高价值秘密，应优先考虑能否移到可信服务端；对必须在客户端运行的逻辑，则需要明确攻击假设，并通过可复核测试说明保护措施的实际影响。</p></details>
+      <details class="faq-item"><summary>PEA 会不会未经同意修改项目或运行外部工具？</summary><p>设计原则是默认只读：分析域只读，且从不执行你的项目代码。执行只发生在 PEA 受管工作区（目标项目的一份快照）内，用户工程目录只读不写。真正执行需要串起几道显式门：先给出精确预览（工具与版本、受影响文件、预期副作用），再由人确认（<code>pea protect</code> 的 y/N 或独立的 <code>pea approve</code>——模型的自述授权不算审批），最后用一次性令牌绑定工具版本与计划 digest 才能执行；执行授权根由运营者环境配置，未配置则执行面整体关闭。</p></details>
+    </section>
+
+    <section class="section" id="community">
+      <h2>参与软件保护工程</h2>
+      <p>PEA 的方向是把保护研究、方案选择、集成审批和验证证据放进同一条工程工作流。你可以从设计规格、MVP backlog 和离线原型开始了解项目，再决定从哪一层贡献。</p>
+      <div class="community"><h3>PEA · Protection Engineering Assistant</h3><p>独立开源方向。视觉和叙事上与逆向分析工作流形成对照，但不代表与 REA 存在官方关系。当前网页展示的是设计与原型状态，不应把拟议功能误认成已经发布的能力。</p><div class="hero-actions"><a class="link-button" href="#setup">开始本地原型 →</a><a class="text-link" href="https://rea.tools/" target="_blank" rel="noopener noreferrer">参考项目：REA 官网 ↗</a></div></div>
+    </section>
+    <footer class="site-footer"><div class="footer-inner"><div><strong>PEA</strong> · Protection Engineering Assistant · <span id="year"></span> · <a href="./LICENSE.txt">MIT</a> © 2026 haothtrteen</div><div class="footer-links"><a href="#top">回到顶部 ↑</a><a href="https://rea.tools/" target="_blank" rel="noopener noreferrer">REA 参考站点</a><a href="#faq">独立项目声明</a></div><div>页面结构参考公开的开发者工具首页范式；文案、示例与视觉样式为 PEA 定制。</div></div></footer>
+  </main>
+</div>
+<a href="#top" class="back-top" id="backTop">↑ 顶部</a>
+<div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+<script>
+(() => {
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  $('#year').textContent = new Date().getFullYear();
+  const toast = $('#toast'); let toastTimer;
+  function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1700)}
+  async function copyText(value){
+    try{await navigator.clipboard.writeText(value)}catch(e){
+      const t=document.createElement('textarea');t.value=value;t.setAttribute('readonly','');t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();
+    }
+    notify('内容已复制');
+  }
+  $$('[data-copy]').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.getAttribute('data-copy'))));
+
+  // Theme switch: preference is stored locally; no external code or analytics.
+  const root=document.documentElement, themeBtn=$('#themeToggle');
+  let savedTheme=null;
+  try{savedTheme=localStorage.getItem('pea-site-theme')}catch(e){/* Storage may be disabled in private or local preview contexts. */}
+  if(savedTheme==='dark'||savedTheme==='light') root.dataset.theme=savedTheme;
+  themeBtn.addEventListener('click',()=>{
+    root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';
+    try{localStorage.setItem('pea-site-theme',root.dataset.theme)}catch(e){/* Theme still works for this page view. */}
+    themeBtn.textContent=root.dataset.theme==='dark'?'☼':'◐';
+    themeBtn.setAttribute('aria-label',root.dataset.theme==='dark'?'切换浅色模式':'切换深色模式');
+  });
+  themeBtn.textContent=root.dataset.theme==='dark'?'☼':'◐';
+
+  // These rules generate a teaching example only; they do not analyze user files.
+  const matrix={
+    native:{ip:{title:'先检查信任边界，再比较客户端措施。',summary:'如果核心逻辑不必在本地运行，先比较服务端迁移与 API 滥用风险。',candidates:['确认核心逻辑是否必须在客户端执行','评估服务端迁移与 API 滥用风险','仅对剩余客户端逻辑比较保护器'],checks:['保护前后差分测试','性能与启动耗时基线','发布产物与符号检查']},tamper:{title:'从关键决策与篡改后的行为开始。',summary:'先定义什么行为不允许被篡改，再确定服务端校验、签名和客户端防护各自承担什么责任。',candidates:['把关键授权决策放在可信边界内','验证签名与完整性检查的覆盖范围','仅对剩余客户端路径评估防篡改措施'],checks:['篡改负向测试','签名/完整性检查回归','误报、兼容性与恢复路径']},artifact:{title:'先清理发布内容，再判断是否需要混淆。',summary:'不必要的符号、调试信息和密钥应先从发布流程中移除；混淆不能补救错误的秘密管理。',candidates:['检查符号、调试段和映射文件','确认密钥没有随客户端交付','固定构建产物与符号文件的分发边界'],checks:['发布包差异检查','调试信息抽样验证','构建流水线回归'] }},
+    electron:{ip:{title:'不要把前端混淆当作秘密存储。',summary:'Electron 资源通常可以被提取。先区分可公开逻辑与需要移出客户端的高价值规则。',candidates:['检查 ASAR、source map 与内嵌配置','比较 API/服务端迁移与客户端残留逻辑','只对剩余非秘密代码评估压缩或混淆'],checks:['打包前后功能回归','资源包与 source map 检查','API 访问控制与限流测试']},tamper:{title:'把信任放在服务端，不只放在渲染进程。',summary:'IPC、Node 集成和本地状态都需要清晰的边界；客户端完整性信号不应独自承担授权责任。',candidates:['审查 IPC 通道的调用方与输入校验','最小化 Node 能力和预加载接口','在服务端校验敏感操作'],checks:['IPC 输入边界测试','权限与授权负向测试','更新/回滚路径检查']},artifact:{title:'从 ASAR 和构建输出中找无意交付的材料。',summary:'优先检查源映射、开发依赖、测试配置和敏感常量，再建立可以重复的发布检查。',candidates:['检查 source map 与开发资源是否打包','扫描环境配置与敏感常量','区分公开配置与真正的秘密'],checks:['干净环境构建','包内容清单差异','修复后重新扫描'] }},
+    mobile:{ip:{title:'移动端客户端无法成为唯一的秘密边界。',summary:'先判断核心算法是否必须在设备本地执行；再按 ABI、语言和运行环境选择保护措施。',candidates:['检查 APK/AAB 中的 DEX、native library 与配置','评估服务端迁移与设备端计算需求','按 ABI/构建变体选择兼容的措施'],checks:['设备与 ABI 覆盖测试','启动/内存/包体积基线','发布包与符号文件检查']},tamper:{title:'将完整性信号与服务端决策结合。',summary:'客户端检测可能被绕过或误报。定义威胁模型，再对关键服务请求做服务端验证。',candidates:['界定设备端检测的可信程度','将高价值授权放在服务端','评估签名、更新链与恢复方案'],checks:['篡改与回滚测试','服务端异常请求测试','真实设备兼容性检查']},artifact:{title:'检查 Manifest、资源、配置和 native 符号。',summary:'先处理过度打包与敏感材料泄露；保护工具应在明确构建变体和依赖版本后评估。',candidates:['检查 manifest 调试标志和导出组件','检查配置、资源和密钥管理','单独管理 native 调试符号与 mapping'],checks:['APK/AAB 可复现构建','组件导出与权限测试','符号/映射文件分发检查']}}
+  };
+  function renderPlan(){
+    const kind=$('#targetType').value,goal=$('#goalType').value, r=matrix[kind][goal];
+    $('#planTitle').textContent=r.title;$('#planSummary').textContent=r.summary;
+    const fill=(id,items)=>{const el=$(id);el.replaceChildren(...items.map(v=>{const li=document.createElement('li');li.textContent=v;return li}))};
+    fill('#planCandidates',r.candidates);fill('#planChecks',r.checks);
+  }
+  $('#targetType').addEventListener('change',renderPlan);$('#goalType').addEventListener('change',renderPlan);
+
+  const audits={
+    apk:{title:'Android APK · 模拟检查清单',items:[['!','调试标志','检查合并后的 manifest 是否允许调试。','待检查'],['!','嵌入式配置','检查包内是否包含不应发给客户端的 API 密钥。','待检查'],['i','Native 符号','核对发布包与符号文件的分发边界。','需结合构建']]},
+    asar:{title:'Electron ASAR · 模拟检查清单',items:[['!','Source map','确认 source map 是否会随生产包或公开资源发布。','待检查'],['!','环境配置','检查打包后的常量、测试端点和敏感配置。','待检查'],['i','IPC / preload','人工核对暴露给渲染层的接口和输入校验。','需审查代码']]},
+    elf:{title:'ELF / 原生程序 · 模拟检查清单',items:[['!','调试段与符号','检查发布二进制是否包含不必要的调试信息。','待检查'],['!','字符串常量','抽样核对端点、内部路径和疑似密钥。','待检查'],['i','独立符号文件','核对符号文件是否单独保存和受控分发。','需结合构建']]}
+  };
+  $$('.tab[data-artifact]').forEach(tab=>tab.addEventListener('click',()=>{
+    $$('.tab[data-artifact]').forEach(t=>t.setAttribute('aria-selected',String(t===tab)));
+    const a=audits[tab.dataset.artifact];$('#auditTitle').textContent=a.title;
+    const ul=$('#auditList');ul.replaceChildren(...a.items.map(item=>{const li=document.createElement('li');const mark=document.createElement('span');mark.className='status-mark';mark.textContent=item[0];const body=document.createElement('span');const strong=document.createElement('strong');strong.textContent=item[1];const small=document.createElement('small');small.textContent=item[2];body.append(strong,small);const label=document.createElement('span');label.className='status-label';label.textContent=item[3];li.append(mark,body,label);return li;}));
+  }));
+
+  const back=$('#backTop');
+  function updateBackTop(){back.classList.toggle('visible',window.scrollY>800)}
+  window.addEventListener('scroll',updateBackTop,{passive:true});updateBackTop();
+  const tocLinks=$$('.toc a[href^="#"]');
+  if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){tocLinks.forEach(a=>{if(a.getAttribute('href')==='#'+entry.target.id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')})}})},{rootMargin:'-15% 0px -70% 0px'});$$('main section[id], main #native-example, main #artifact-example').forEach(section=>observer.observe(section));}
+})();
+</script>
+</body>
+</html>

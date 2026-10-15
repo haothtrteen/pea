@@ -1,0 +1,371 @@
+{
+  "schema_version": "1.0",
+  "research_date": "2026-10-13",
+  "note": "Capability families abstract public tool documentation; confirm actual tools/provider and current availability at runtime. Families 1-10 derive from the REA capability review; 'dart_aot_snapshot_analysis' derives from targeted community tooling research (blutter / reFlutter / Doldrums, web-verified 2026-10-13, see sources.md) and is not part of REA's published tool list.",
+  "mappings": [
+    {
+      "id": "native-static-analysis",
+      "capability_family": "native_binary_inspection",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "artifact format and sections",
+        "strings and symbols",
+        "procedure/function inventory",
+        "cross references",
+        "call graph and control-flow graph",
+        "assembly and decompiled pseudocode"
+      ],
+      "potential_exposures": [
+        "unnecessary debug symbols",
+        "hard-coded secrets and internal paths",
+        "sensitive routines are trivially identifiable",
+        "client-only authorization decisions"
+      ],
+      "defense_options": [
+        "remove unneeded debug artifacts from release packages",
+        "move long-lived secrets and final authorization decisions to a trusted boundary",
+        "evaluate mature function-level obfuscation or virtualization for selected functions",
+        "retain private symbol maps outside public artifacts"
+      ],
+      "verification": [
+        "release artifact manifest and string/symbol scan",
+        "baseline-versus-protected static review under pinned analyzer version",
+        "semantic differential tests",
+        "performance and compatibility tests"
+      ],
+      "limitations": [
+        "analysis failure is not protection evidence",
+        "obfuscation raises cost but does not prove confidentiality",
+        "provider capabilities vary by version and platform"
+      ]
+    },
+    {
+      "id": "javascript-electron-artifact-graph",
+      "capability_family": "javascript_electron_static_analysis",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "package metadata and entrypoints",
+        "imports and bundle module relationships",
+        "source map declarations",
+        "preload and contextBridge surfaces",
+        "IPC channels and validation candidates",
+        "ASAR integrity metadata"
+      ],
+      "potential_exposures": [
+        "published source maps or sourcesContent",
+        "oversized preload/IPC privilege surface",
+        "renderer can request privileged operations without robust sender/schema checks",
+        "embedded credentials or internal endpoints"
+      ],
+      "defense_options": [
+        "exclude or restrict production source maps",
+        "minimize preload APIs and IPC channels",
+        "validate sender, origin, channel schema, and authorization at the trusted process/server",
+        "avoid embedding long-lived secrets in renderer bundles"
+      ],
+      "verification": [
+        "inspect final ASAR and companion files",
+        "IPC positive and negative contract tests",
+        "search built assets for canary secrets",
+        "confirm integrity metadata and expected artifact hashes"
+      ],
+      "limitations": [
+        "static syntax does not prove runtime execution",
+        "dynamic values and ambiguous IPC pairing remain unknown",
+        "do not parse unknown artifacts by executing their bootstrap code"
+      ]
+    },
+    {
+      "id": "web-browser-runtime-observation",
+      "capability_family": "browser_and_network_observation",
+      "exposure_tier": "runtime_behavior",
+      "observations": [
+        "DOM and visible UI behavior",
+        "network requests and responses",
+        "storage and endpoint references",
+        "runtime console/log output"
+      ],
+      "potential_exposures": [
+        "client-side secrets",
+        "overly broad API responses",
+        "authorization enforced only in client UI",
+        "long-lived tokens or sensitive values in logs"
+      ],
+      "defense_options": [
+        "server-side authentication and authorization",
+        "short-lived scoped credentials",
+        "rate limiting and abuse monitoring",
+        "data minimization and redacted logs"
+      ],
+      "verification": [
+        "unauthorized access tests",
+        "expired/replayed token tests",
+        "API schema/data minimization review",
+        "log scrubbing tests"
+      ],
+      "limitations": [
+        "observed behavior is limited to tested scenarios",
+        "correlation does not prove causation",
+        "never rely on client UI hiding as an authorization boundary"
+      ]
+    },
+    {
+      "id": "managed-dotnet-android-analysis",
+      "capability_family": "managed_code_and_mobile_analysis",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "assembly or DEX metadata",
+        "type and method names",
+        "resources and manifests",
+        "mapping and reflection-related behavior"
+      ],
+      "potential_exposures": [
+        "unnecessary names and debug metadata",
+        "secrets in package assets",
+        "public mapping files",
+        "reflection/JNI changes from aggressive shrinking"
+      ],
+      "defense_options": [
+        "use platform-native shrinker/obfuscator or a mature product",
+        "securely retain mapping files for crash diagnosis",
+        "avoid long-lived secrets in client packages",
+        "test reflection, serialization, JNI and dynamic loading"
+      ],
+      "verification": [
+        "inspect final package contents",
+        "release-mode integration tests",
+        "mapping-file access control",
+        "device/runtime matrix tests"
+      ],
+      "limitations": [
+        "platform/tool versions affect coverage",
+        "local integrity signals are not a server trust boundary"
+      ]
+    },
+    {
+      "id": "process-and-filesystem-observation",
+      "capability_family": "runtime_process_observation",
+      "exposure_tier": "runtime_behavior",
+      "observations": [
+        "process launch arguments",
+        "stdout/stderr and logs",
+        "file and temporary artifact activity",
+        "process lifecycle and selected network activity"
+      ],
+      "potential_exposures": [
+        "credentials in argv or environment",
+        "plaintext temporary files",
+        "sensitive debug logs and crash dumps",
+        "over-privileged service identity"
+      ],
+      "defense_options": [
+        "pass credentials through managed secret channels rather than argv",
+        "minimize log content and redact sensitive values",
+        "restrict permissions and temporary-file lifetime",
+        "apply OS-specific dump/debug controls only after target-platform testing"
+      ],
+      "verification": [
+        "canary-based leak scan over test logs/temp files",
+        "least-privilege runtime test",
+        "cancellation and cleanup test",
+        "platform-specific negative test"
+      ],
+      "limitations": [
+        "runtime capture coverage depends on provider and permissions",
+        "kernel and privileged-user controls are platform specific"
+      ]
+    },
+    {
+      "id": "snapshot-diff-evidence",
+      "capability_family": "artifact_and_function_comparison",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "artifact identity and digests",
+        "function or module differences",
+        "static and runtime Evidence provenance",
+        "coverage and unresolved questions"
+      ],
+      "potential_exposures": [
+        "unexpected regressions between builds",
+        "reports accidentally containing source or secrets",
+        "unknown coverage misreported as success"
+      ],
+      "defense_options": [
+        "establish signed artifact baselines",
+        "redact report payloads and restrict local evidence permissions",
+        "make unknown and partial coverage explicit"
+      ],
+      "verification": [
+        "repeatable digest and diff checks",
+        "report redaction tests",
+        "forced-unknown fixture",
+        "release manifest reconciliation"
+      ],
+      "limitations": [
+        "a diff alone does not establish maliciousness or causality",
+        "missing observations cannot prove equivalence"
+      ]
+    },
+    {
+      "id": "platform-layout-and-build-metadata",
+      "capability_family": "binary_layout_and_build_metadata",
+      "exposure_tier": "static_content",
+      "observations": [
+        "ELF sections and segments",
+        "compiler/build metadata where present",
+        "symbols and relocations where available",
+        "artifact format and declared mitigations"
+      ],
+      "potential_exposures": [
+        "debug/build paths and symbols leak internal structure",
+        "release artifact contains unexpected sections or files",
+        "security mitigation assumptions are not reflected in the shipped binary"
+      ],
+      "defense_options": [
+        "compare release artifacts against an allowlisted build manifest",
+        "strip only nonessential symbols while retaining private symbol files for diagnostics",
+        "make compiler/linker hardening options explicit and platform-specific"
+      ],
+      "verification": [
+        "binary metadata inspection with a pinned tool version",
+        "reproducible build or controlled artifact diff where feasible",
+        "positive and negative fixtures for missing/unexpected sections"
+      ],
+      "limitations": [
+        "format parsers may support only selected architectures",
+        "presence of a mitigation marker does not prove runtime effectiveness",
+        "Go-specific metadata availability depends on build mode and stripping"
+      ]
+    },
+    {
+      "id": "bytecode-and-database-artifacts",
+      "capability_family": "wasm_evm_sqlite_and_related_static_artifacts",
+      "exposure_tier": "static_content",
+      "observations": [
+        "WASM module structure and imports/exports",
+        "EVM bytecode selectors/offsets where supported",
+        "SQLite schema and selected metadata"
+      ],
+      "potential_exposures": [
+        "business logic or endpoint constants embedded in bytecode",
+        "sensitive data shipped in local database fixtures",
+        "unsafe trust in a client-controlled bytecode/database state"
+      ],
+      "defense_options": [
+        "avoid embedding secrets or authoritative authorization in distributable client artifacts",
+        "minimize shipped database content and validate database integrity as appropriate",
+        "use server-side checks for decisions that require a trusted authority"
+      ],
+      "verification": [
+        "format-aware static scan against self-owned fixtures",
+        "canary secret scan of final deliverables",
+        "negative tests that alter local state or request unauthorized operations"
+      ],
+      "limitations": [
+        "decompilation quality varies by format and optimization level",
+        "static bytecode inspection does not reveal every runtime path",
+        "client-side integrity checks can be bypassed by a privileged device owner"
+      ]
+    },
+    {
+      "id": "mobile-framework-and-managed-artifacts",
+      "capability_family": "dotnet_android_flutter_jeb_and_managed_artifacts",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "APK/DEX/resources/manifest metadata",
+        "managed assembly metadata",
+        "Flutter/Dart-related native and packaged artifacts where supported",
+        "mapping, JNI/FFI and reflection-related hints"
+      ],
+      "potential_exposures": [
+        "unnecessary symbols, mapping files or build metadata are shipped",
+        "sensitive configuration and long-lived credentials embedded in app packages",
+        "aggressive shrinking or obfuscation breaks reflection/serialization/native bridges"
+      ],
+      "defense_options": [
+        "use platform-native shrinker or mature language-specific protection with a pinned toolchain",
+        "retain mapping files in access-controlled private storage",
+        "move trusted authorization and durable secrets out of client artifacts"
+      ],
+      "verification": [
+        "inspect the final signed package and companion files",
+        "release-mode device/runtime matrix",
+        "regression tests for reflection, serialization, JNI/FFI, dynamic loading and app update"
+      ],
+      "limitations": [
+        "one framework/provider result does not cover every runtime or device",
+        "obfuscation does not establish a secret boundary",
+        "mapping-file exposure must be checked in the actual distribution channel"
+      ]
+    },
+    {
+      "id": "capture-and-embedded-evidence",
+      "capability_family": "network_capture_firmware_logic_signal_and_recorded_crash_artifacts",
+      "exposure_tier": "runtime_behavior",
+      "observations": [
+        "saved network packet captures",
+        "firmware/package/resource files",
+        "recorded crash notes/register context where supported",
+        "logic signal captures and process observations where supported"
+      ],
+      "potential_exposures": [
+        "secrets or personal data persisted in diagnostic captures",
+        "firmware resources expose keys, endpoints or debug interfaces",
+        "crash bundles contain memory-derived secrets or private paths"
+      ],
+      "defense_options": [
+        "sanitize diagnostic captures before sharing",
+        "remove development credentials and debug interfaces from release firmware",
+        "limit retention/access for crash data and document sensitive fields"
+      ],
+      "verification": [
+        "canary data scan and redaction tests",
+        "firmware release manifest and secret scan",
+        "permissions/retention checks for diagnostic evidence"
+      ],
+      "limitations": [
+        "analysis support depends on file format, external tools and capture completeness",
+        "a recorded crash snapshot is not equivalent to live process analysis",
+        "do not collect captures or attach to devices without explicit scope and authorization"
+      ]
+    },
+    {
+      "id": "dart-aot-snapshot-analysis",
+      "capability_family": "dart_aot_snapshot_analysis",
+      "exposure_tier": "tool_efficiency",
+      "observations": [
+        "Dart SDK version is auto-detected from libflutter.so and a matching Dart runtime is compiled to parse libapp.so (blutter)",
+        "class hierarchy, method lists and annotated ARM64 assembly are recovered from the Dart AOT snapshot",
+        "the Dart object pool is dumped wholesale (pp.txt), exposing strings, constants and embedded endpoints or key material",
+        "an auto-generated Frida hook template (blutter_frida.js) attaches to recovered Dart functions",
+        "a patched Flutter engine can dump runtime snapshot state and neutralize BoringSSL certificate verification (reFlutter)",
+        "Dart 2.x-era snapshots are parsed by pure-Python tooling without compiling the runtime (Doldrums)"
+      ],
+      "potential_exposures": [
+        "licensing or authorization logic shipped inside libapp.so is recoverable as class/method structure",
+        "hard-coded endpoints, secrets and key material sit in the Dart object pool and are dumped in one pass",
+        "Flutter bypasses the platform TLS stack, so engine patching enables traffic interception",
+        "single-layer platform shrinkers (R8/ProGuard) touch only the Java/Kotlin host layer and leave the Dart snapshot intact"
+      ],
+      "defense_options": [
+        "enable Flutter release obfuscation (--obfuscate plus --split-debug-info) as a cost-raising baseline, not as a secret boundary",
+        "move final authorization decisions and durable secrets to a server or trusted boundary whenever the deployment posture allows",
+        "relocate critical pure functions behind an FFI boundary into a natively protected library so a different toolchain is required",
+        "admit Dart-aware virtualization candidates only after source-level verification of claims, license and maintenance",
+        "run the same analyst tooling against the own release artifact before distribution and record what is recovered"
+      ],
+      "verification": [
+        "run blutter-class tooling against the release libapp.so and record which classes and functions are recovered",
+        "confirm the object pool dump contains no secret or endpoint that requires protection",
+        "test the release build against engine patching (reFlutter) and Frida hooking attempts",
+        "differential and regression tests for FFI boundaries and the licensing flows"
+      ],
+      "limitations": [
+        "snapshot parsing depends on matching the exact Dart SDK version; tooling may lag new releases",
+        "obfuscated snapshots remain structurally parseable even though automated recovery of many functions degrades (the tool's own TODO tracks this)",
+        "a result on one arm64 Android build does not cover other ABIs, iOS builds or custom engine builds",
+        "community tooling evolves fast; re-verify every claim before relying on it"
+      ]
+    }
+  ]
+}

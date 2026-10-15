@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEA 项目分析与可落地优化路线</title>
+<style>
+:root{--page:#fffefa;--surface:#f7f8f3;--ink:#202822;--muted:#5e6961;--line:#dfe5dd;--accent:#2d694e;--accent-soft:#e2efe5;--warm:#b9502f;--code:#f4f6f1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.75}
+.top{border-bottom:1px solid var(--line);padding:22px 0;background:var(--page)}
+.top .in{width:min(900px,calc(100% - 40px));margin:0 auto;display:flex;align-items:center;gap:12px}
+.mark{width:30px;height:30px;border:2px solid var(--accent);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-weight:850}
+.top b{font-size:16px;letter-spacing:-.02em}
+.top span{font-size:11px;color:var(--muted);letter-spacing:.06em}
+main{width:min(900px,calc(100% - 40px));margin:0 auto;padding:30px 0 80px}
+h1{font-size:30px;letter-spacing:-.04em;line-height:1.25;margin:.4em 0 .6em}
+h2{font-size:22px;letter-spacing:-.03em;margin:2em 0 .6em;padding-top:.5em;border-top:1px solid var(--line)}
+h3{font-size:17px;letter-spacing:-.02em;margin:1.6em 0 .4em;color:var(--accent)}
+blockquote{margin:1.2em 0;padding:12px 16px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink);font-size:14px}
+blockquote p{margin:.3em 0}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--surface);font-weight:700;white-space:nowrap}
+tr:nth-child(even) td{background:#fbfcf9}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.1em .35em}
+pre{background:var(--code);border:1px solid var(--line);border-radius:7px;padding:14px;overflow:auto}
+pre code{background:none;border:0;padding:0}
+strong{color:#111a13}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+ul,ol{padding-left:22px}
+li{margin:.3em 0}
+a{color:var(--accent)}
+</style></head><body>
+<div class="top"><div class="in"><span class="mark">P</span><div><b>PEA 项目分析报告</b><br><span>PEA-Design-Kit v0.2.2 · 优化点与落地路线</span></div></div></div>
+<main><h1 id="pea">PEA 项目分析与可落地优化路线</h1>
+<blockquote>
+<p>分析对象：<code>PEA-Landing-Page.zip</code>（落地页 + 内嵌 <code>PEA-Design-Kit-v0.2.2.zip</code>）
+分析日期：2026-10-13 ｜ 分析环境：Ubuntu 22.04 / Python 3.11.1
+结论一句话（2026-10-13 时点；其后版本已逐项回填）：<strong>这是一个"设计规格 + 数据合同 + 离线规划器原型"的早期仓库，文档质量远高于工程实现质量；短板集中在"契约未被代码强制""打分引擎形同虚设""零工程化底座"三点上，且这三点都可以在当前沙箱内直接补齐。</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>历史分析（针对 v0.2.2 快照）—— 请勿按本文判断项目现状</strong>：本文写于 2026-10-13，分析对象是 0.2.2 期的仓库快照（当时只有 <code>pea_planner/{cli.py,planner.py}</code> 两个实现文件、8 个单元测试）。文中一切"现状"叙述都指<strong>该时点</strong>，且<strong>均已被后续版本取代</strong>：契约强校验与真实打分轴（0.3.0）、工程化门禁与 CI（0.4.0，现 2451 passed + 36 契约门）、八个只读域（M3）、MCP 骨架与审批令牌（M4/M5）、任务编排器（WP2）、<strong>受控执行闭环与一句话保护命令（0.7.0）</strong>。仍未实现（如实保留）：在线研究连接器、真正的 IR/VMP 后端、宿主确认 UI、多平台执行。本文保留为<strong>历史记录</strong>；当前状态请看 <code>README_zh.md</code>、<code>CHANGELOG.md</code> 与 <code>docs/Prototype-1.0-Demo-zh-CN.md</code>。</p>
+</blockquote>
+<hr />
+<h2 id="_1">一、项目概览</h2>
+<p>外层是一个自包含单页官网，内层 <code>downloads/</code> 里装的是真正的工程主体（PEA Design Kit）。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>内容</th>
+<th>规模</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>官网</td>
+<td><code>index.html</code>（自包含：内联 CSS/JS，无 CDN/无网络请求）</td>
+<td>353 行 / 44 KB</td>
+</tr>
+<tr>
+<td>说明</td>
+<td><code>README.md</code>、<code>DESIGN-MAPPING.md</code>、<code>NOTICE.md</code>、<code>LICENSE.txt</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Design Kit</td>
+<td>43 个文件，含 <code>pea_planner/</code>（原型）、<code>schemas/</code>（8 个）、<code>catalog/</code>、<code>mcp/</code>、<code>skills/</code>（4 个）、<code>docs/</code>（13 篇）、<code>examples/</code>、<code>tests/</code></td>
+<td>1.3 MB</td>
+</tr>
+</tbody>
+</table>
+<p><strong>PEA 的定位</strong>：一个"保护工程编排"的 Agent 工具设计——检索成熟保护方案 → 识别自身软件暴露面 → 生成可审阅计划 → 经审批受控执行 → 用测试证据验证。它明确拒绝第三方授权绕过、密钥窃取等非法用途，并把"未验证"强制标为 <code>unknown</code>，不以构建成功冒充安全成功。这套<strong>安全与合规理念在文档层面做得相当扎实</strong>，是本项目最值得保留的资产。</p>
+<h3 id="vs">目录结构对照（文档承诺 vs 实际）</h3>
+<p><code>docs/PEA-Implementation-Plan-zh-CN.md</code> 里画的目标结构是 <code>src/pea/{api,service,schemas,planner,adapters,execution,...}</code>，但<strong>实际代码只有 <code>pea_planner/{cli.py,planner.py}</code> 两个文件</strong>。这本身不是错（原型阶段），但意味着任何新开发者按文档找代码会扑空——需要在 README 里显式标注"当前为 PoC 布局，目标布局见 X"。</p>
+<hr />
+<h2 id="_2">二、实际验证结果（我在沙箱里跑过的）</h2>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>命令/方法</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单元测试</td>
+<td><code>python -m unittest discover -s tests -v</code></td>
+<td>✅ 8/8 通过</td>
+</tr>
+<tr>
+<td>CLI 冒烟</td>
+<td><code>catalog</code> / <code>search</code> / <code>plan</code></td>
+<td>✅ 均正常，<code>plan</code> 输出 <code>strategy=existing_tool status=needs_user_review</code></td>
+</tr>
+<tr>
+<td>Schema 一致性</td>
+<td>jsonschema 校验 8 条目录条目</td>
+<td>✅ 8/8 合规</td>
+</tr>
+<tr>
+<td>示例与 Schema 匹配</td>
+<td>校验 <code>protection-request/plan.example.json</code></td>
+<td>✅ 0 错误</td>
+</tr>
+<tr>
+<td>文档产物</td>
+<td><code>pdfinfo</code></td>
+<td>✅ PDF 11 页，与更新说明一致</td>
+</tr>
+<tr>
+<td><strong>非法 goal 输入</strong></td>
+<td><code>goals:["totally_invalid_goal"]</code></td>
+<td>❌ <strong>被静默接受</strong>（分析时点）——<strong>已修复</strong>：入口校验直接拒绝并列出违规路径</td>
+</tr>
+<tr>
+<td><strong>缺字段/空 targets</strong></td>
+<td>去掉 <code>project_path</code>、<code>targets:[]</code></td>
+<td>❌ <strong>被静默接受</strong>（分析时点）——<strong>已修复</strong>：同上</td>
+</tr>
+<tr>
+<td><strong>打分是否区分候选</strong></td>
+<td>构造功能匹配度截然不同的两条候选</td>
+<td>❌ <strong>两者得分完全相同（均 90.0）</strong>（分析时点）——<strong>已修复</strong>：打分按真实轴计算，<code>basis</code> 逐项可查</td>
+</tr>
+</tbody>
+</table>
+<p>后三条是本次分析发现的<strong>真实缺陷</strong>，也是优化价值最高的地方。</p>
+<hr />
+<h2 id="_3">三、优化点（按优先级）</h2>
+<h3 id="p0">P0 — 契约没有被代码强制（数据合同形同虚设）</h3>
+<p>项目花了大量精力写 JSON Schema，但 <code>planner.py</code> <strong>完全没引用 <code>schemas/</code></strong>，只做了最低限度的手工键检查（<code>load_catalog</code> 里核对 8 个必填键）。后果：</p>
+<ul>
+<li><code>goals</code> 里塞非法值、<code>targets</code> 为空、<code>project_path</code> 缺失，全都被当合法输入处理；</li>
+<li>Schema 与实现会随时间静默漂移，而"Schema 是单一真源"正是该项目自己宣称的原则；</li>
+<li><code>additionalProperties:false</code> 之类的严格性在运行时完全没有生效。</li>
+</ul>
+<p><strong>建议</strong>：引入 <code>jsonschema</code>（或 <code>fastjsonschema</code>），在 <code>build_plan</code> / <code>load_catalog</code> 入口做 fail-fast 校验，错误码区分"输入非法(2)"与"策略阻断(4)"（当前两者都混在 exit=2/4 里）。工作量：<strong>0.5 天</strong>。</p>
+<h3 id="p0_1">P0 — 策略引擎的打分维度是假的</h3>
+<p><code>candidate_score()</code> 里 <code>fit</code>、<code>platform_fit</code> 恒为 <code>1.0</code>，<code>build_integration</code>、<code>performance_fit</code> 恒为 <code>0.5</code>——也就是说架构文档第 8 节承诺的"功能匹配 25% + 平台适配 20%"两个最大权重维度<strong>根本没有计算</strong>。得分实际只由 <code>maintenance / license / trust_level</code> 三项（合计 40 分权重）决定，且被硬编码常数推高到固定值。</p>
+<p>实测证据：两条功能匹配度完全不同的候选，得分都是 90.0，排序无意义。</p>
+<p><strong>建议</strong>：让评分真正读取 <code>request.goals ∩ entry.capabilities</code> 的重合度、<code>request.targets</code> 与 <code>entry.targets</code> 的覆盖度、以及 <code>performance_budget_percent</code> 约束；并在计划输出里附<strong>逐维度得分 + 证据缺口</strong>（文档已如此要求，只是没实现）。工作量：<strong>1 天</strong>。</p>
+<h3 id="p1-search_catalog">P1 — <code>search_catalog</code> 的目标匹配逻辑有歧义</h3>
+<pre><code class="language-python">target_match = &quot;all&quot; in entry_targets or &quot;unknown&quot; not in entry_targets and bool(normalized.intersection(entry_targets))
+</code></pre>
+<p>混合了 <code>or/and</code> 且没有括号，实际语义是 <code>A or (B and C)</code>。从注释和上下文看，作者想表达的是"目标含 <code>unknown</code> 的条目应谨慎匹配"，但现写法会让含 <code>unknown</code> 的条目<strong>只能靠 <code>all</code> 命中</strong>，行为难以预期。建议显式拆成命名函数 + 加注释 + 补测试。工作量：<strong>0.5 天</strong>。</p>
+<h3 id="p1">P1 — 零工程化底座</h3>
+<p>仓库<strong>没有</strong> <code>pyproject.toml</code> / <code>requirements.txt</code> / <code>.github/workflows</code> / lint / type check / 打包配置。README 要求用户"在项目根目录手动跑 <code>python -m pea_planner.cli</code>"，无法 <code>pip install</code>，也无法 CI。</p>
+<p><strong>建议</strong>：补齐 <code>pyproject.toml</code>（<code>src/</code> 布局 + <code>[project.scripts] pea = ...</code>）、<code>pytest</code>、<code>ruff</code>、<code>mypy</code>、GitHub Actions（跑测试 + Schema 一致性校验 + 文档链接检查）。工作量：<strong>1 天</strong>。</p>
+<h3 id="p1_1">P1 — 测试覆盖偏薄</h3>
+<p>现有 8 个测试只覆盖"正常路径 + 2 个阻断分支"，缺失：CLI 端到端测试、Schema 负例、路径越界/symlink 逃逸（文档第 15 节列为核心验收项却无测试）、打分排序正确性、<code>search --include-research</code> 语义。工作量：<strong>1 天</strong>。</p>
+<h3 id="p2">P2 — 文档信息架构与版本散落</h3>
+<p>文档总量 1386 行、质量很高，但存在可维护性隐患：版本号（0.2.2 / 0.2.1 / 0.2.0）散落在多个文件；<code>Threat-Model</code> 标题写的是 v0.2.0 而项目已到 0.2.2；用户上传的 <code>skill-lang-vmp-guide-original.zip</code> <strong>无独立 LICENSE</strong>，目前"原样保留"，需要在 NOTICE 里更醒目地标注"未经权利人确认不得公开再分发"。工作量：<strong>0.5 天</strong>。</p>
+<h3 id="p2-seo">P2 — 落地页的 SEO 与前端工程</h3>
+<p>页面本身做得不错（响应式、深浅色、<code>prefers-reduced-motion</code>、ARIA、无外部请求）。可优化点：</p>
+<ul>
+<li>缺 <code>og:image</code> / <code>twitter:card</code> / <code>&lt;link rel="canonical"&gt;</code> / favicon / JSON-LD 结构化数据；</li>
+<li>纯内联 44KB，无缓存策略与构建流程，后续维护靠手改大文件；</li>
+<li>下载包与页面是"手工对齐"版本号，容易漂移，建议由构建脚本注入版本。</li>
+</ul>
+<p>工作量：<strong>1 天</strong>。</p>
+<hr />
+<h2 id="_4">四、可在当前环境落地的开发路线</h2>
+<blockquote>
+<p>判定标准：<strong>只要 Python 3.11 + Node + 联网 pip 就能在沙箱内完成</strong>的算"当前可落地"；需要真实保护器二进制、真机、特定网络资源的算"需外部条件"，本期只做脚手架 + fixture/mock。</p>
+</blockquote>
+<h3 id="m0-2">里程碑 M0 — 工程化基座（当前可落地，约 2 天）</h3>
+<table>
+<thead>
+<tr>
+<th>交付物</th>
+<th>验收条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pyproject.toml</code> + <code>src/pea/</code> 布局 + <code>pea</code> 命令入口</td>
+<td><code>pip install -e .</code> 后 <code>pea catalog</code> 可跑</td>
+</tr>
+<tr>
+<td><code>pytest</code> 迁移 + <code>ruff</code> + <code>mypy</code></td>
+<td>CI 全绿，类型检查通过</td>
+</tr>
+<tr>
+<td>GitHub Actions：测试 / Schema 一致性 / 文档链接存活</td>
+<td>PR 触发即跑，失败阻断合并</td>
+</tr>
+</tbody>
+</table>
+<h3 id="m1-2">里程碑 M1 — 契约优先（当前可落地，约 2 天）</h3>
+<p>把 <code>schemas/*.json</code> 变成<strong>唯一真源</strong>：入口强校验 <code>protection-request</code>、<code>catalog-entry</code>；非法输入 fail-fast 并返回结构化错误码；用 Schema 自动生成 CLI <code>--help</code> 与示例骨架；加一组"正例通过 / 负例被拒"的契约测试。<strong>验收：本次发现的 3 个静默接受缺陷全部变成显式拒绝。</strong></p>
+<h3 id="m2-3">里程碑 M2 — 可解释的决策引擎（当前可落地，约 3 天）</h3>
+<p>重写 <code>planner.py</code>：真实计算功能匹配度、平台覆盖度、性能预算约束；输出<strong>逐维度得分 + 证据缺口 + 排除原因</strong>（对齐架构文档第 8 节）；把 <code>locals()</code> 反模式改成显式变量；补排序/门控单元测试。<strong>验收：两条功能匹配度不同的候选必须得到不同得分与不同排序。</strong></p>
+<h3 id="m3-4">里程碑 M3 — 只读画像与暴露面扫描（当前可落地，约 4 天）</h3>
+<p>实现文档 Phase 1 承诺的只读能力：目录/构建清单解析、产物 manifest（相对路径 + SHA-256 + 类型）、符号/字符串/source-map/疑似密钥检测。硬性要求：<strong>默认不读 <code>.env</code>/私钥/凭据</strong>；秘密命中只回显类型+位置+脱敏摘要；路径穿越、symlink 逃逸、超大文件、异常编码全部有测试；用 canary fixture 验证命中率与误报。<strong>这是本项目最有实际价值、且完全无高副作用风险的一块。</strong></p>
+<h3 id="m4-mcp-4">里程碑 M4 — MCP 服务与审批门（当前可落地，约 4 天）</h3>
+<p>按 <code>mcp/tool-contract.json</code> 落一个 MCP server 骨架，与 CLI <strong>共用同一 service layer</strong>（文档明确要求，当前两者尚未拆分）；实现一次性审批令牌：绑定 <code>plan_digest</code> + 工件摘要 + 工具版本 + 路径范围，支持过期/重放/跨目录复用拒绝；<code>apply_plan</code> 未获批准必须失败。沙箱内可用 mock adapter 验证门控逻辑，无需真实保护器。</p>
+<h3 id="m5-2">里程碑 M5 — 报告与证据账本（当前可落地，约 2 天）</h3>
+<p>SQLite/JSON 证据账本 + 脱敏 Markdown/JSON 报告，实现"用 plan/run ID 可重建该次运行"；确保报告不含 canary 秘密原文。对齐架构文档附录 A 的报告字段。</p>
+<h3 id="m6-1">里程碑 M6 — 落地页现代化（当前可落地，约 1 天）</h3>
+<p>补 <code>og:image</code>、canonical、favicon、JSON-LD；把内联 CSS/JS 拆成源文件 + 构建脚本注入版本号，使下载包与页面版本自动对齐。</p>
+<h3 id="fixture">需外部条件（本期只留接口与 fixture，不做实作）</h3>
+<ul>
+<li>真实保护器 adapter（需固定版本二进制、许可审查、真机/真构建环境）；</li>
+<li>线上研究连接器（需受控网络策略与域名 allowlist）；</li>
+<li>受限 IR/VM 后端（文档自己也把它列为 Phase 7 独立分支，<strong>不应作为近期目标</strong>）。</li>
+</ul>
+<hr />
+<h2 id="_5">五、优先级总表</h2>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>事项</th>
+<th>影响</th>
+<th>成本</th>
+<th>当前可落地</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td>入口强制 JSON Schema 校验</td>
+<td>高（正确性/安全前提）</td>
+<td>0.5 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>重写打分引擎，真实计算维度</td>
+<td>高（核心输出可信度）</td>
+<td>1 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>工程化底座 + CI</td>
+<td>高（可维护性）</td>
+<td>2 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>补齐测试（含路径/symlink/负例）</td>
+<td>高</td>
+<td>1 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>修正 <code>search_catalog</code> 匹配逻辑</td>
+<td>中</td>
+<td>0.5 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>文档版本统一 + 许可风险标注</td>
+<td>中</td>
+<td>0.5 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>落地页 SEO/构建流程</td>
+<td>中</td>
+<td>1 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>—</td>
+<td>只读 Profiler/Exposure Scanner</td>
+<td>很高（真实价值）</td>
+<td>4 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>—</td>
+<td>MCP 骨架 + 审批令牌</td>
+<td>高</td>
+<td>4 天</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>—</td>
+<td>真实保护器 adapter / IR-VM 后端</td>
+<td>高</td>
+<td>大</td>
+<td>⚠️ 半落地：真实保护器 adapter 已落地（<code>javascript-obfuscator</code>@5.9.0，0.7.0）；IR/VMP 后端仍待外部条件</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_6">六、风险与边界提醒</h2>
+<ol>
+<li><strong>合规优先于功能</strong>：<code>ShellVMP</code> / <code>FDartVMP</code> 为 AGPL-3.0 + 商业双授权，闭源集成前必须做项目级许可审查；用户上传的 Skill 原始包<strong>无 LICENSE</strong>，公开再分发前须由权利人确认。这些应在 NOTICE 中前置警示，而不是埋在文档中段。</li>
+<li><strong>保持"默认只读 + 显式审批"的架构红线</strong>：M3/M4 落地时最容易走偏的就是"顺手把执行也做了"，务必让 <code>apply_plan</code> 严格依赖一次性令牌。</li>
+<li><strong>不要把 <code>unknown</code> 转成 <code>pass</code></strong>：这是本项目自己定的第 5 条原则，也是打分/报告改动时最容易被无意破坏的语义。</li>
+</ol>
+<hr />
+<h2 id="_7">附：本次分析产出</h2>
+<ul>
+<li>已在沙箱内完整解压、运行测试、跑通 CLI、做 Schema 一致性校验与边界探测；</li>
+<li>发现的 3 个可复现缺陷（静默接受非法输入 ×2、打分不区分候选 ×1）均附实测证据，可直接转成 M0/M1/M2 的验收用例。</li>
+</ul></main>
+</body></html>

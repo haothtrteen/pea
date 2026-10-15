@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/adapter-manifest.schema.json",
+  "title": "PEA Protection Adapter Manifest",
+  "description": "每个保护工具适配器的机器可读清单（WP3 §3.1）。契约门断言所有已登记适配器的 manifest 逐字段符合本 schema；字段缺失即接线失败，不是宽恕。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "tool_id",
+    "tool_version",
+    "license",
+    "provenance",
+    "supported_languages",
+    "supported_targets",
+    "transformations",
+    "input_scope",
+    "output_scope",
+    "config_schema",
+    "resource_limits",
+    "verification_requirements",
+    "known_limitations"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "tool_id": {"type": "string", "minLength": 1},
+    "tool_version": {"type": "string", "minLength": 1},
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spdx", "status"],
+      "properties": {
+        "spdx": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["verified", "needs_review", "incompatible", "not_applicable", "unknown"]}
+      }
+    },
+    "provenance": {"type": "string", "minLength": 1},
+    "supported_languages": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "supported_targets": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "transformations": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "input_scope": {"type": "string", "minLength": 1},
+    "output_scope": {"type": "string", "minLength": 1},
+    "config_schema": {"type": "object"},
+    "resource_limits": {
+      "type": "object",
+      "required": ["timeout_seconds", "max_output_bytes"],
+      "additionalProperties": false,
+      "properties": {
+        "timeout_seconds": {"type": "integer", "minimum": 1},
+        "max_output_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "verification_requirements": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "known_limitations": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}

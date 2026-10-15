@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "simulation_id": "atk-flutter-licensing-demo-0001",
+  "plan_id": "plan-6105464a93ce",
+  "target_artifacts": [
+    {
+      "path": "build/baseline/app-release.apk",
+      "role": "unprotected_baseline",
+      "sha256": "5f2b1c8d9e4a7b3f6c0d1e2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c"
+    },
+    {
+      "path": "build/protected/app-release-obfuscated.apk",
+      "role": "protected_candidate",
+      "sha256": "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b"
+    }
+  ],
+  "sandbox": {
+    "isolation": "disposable_container",
+    "read_only_artifacts": true,
+    "time_budget_minutes": 180,
+    "network": false,
+    "device": "用户提供的测试机（Android arm64）；禁止使用生产设备"
+  },
+  "capability_steps": [
+    {
+      "step_id": "A1",
+      "capability_family": "dart_aot_snapshot_analysis",
+      "objective": "量化保护前后从 libapp.so 恢复业务类/方法结构的差异",
+      "method": "blutter 分别解析两份产物的 lib/arm64-v8a/，比对输出中 package/ 业务库恢复出的类与方法数量及符号质量",
+      "tool_environment": "blutter（用户环境自装，需匹配 Dart SDK 版本；PEA 不分发、不自动安装）",
+      "time_budget_minutes": 90,
+      "expected_observation": "partial_recovery",
+      "failure_meaning": "cost_raised",
+      "applies_to": "both",
+      "notes": "blutter 对混淆快照自述 many functions missing——恢复率下降须量化为成本差记录，不得解释为不可逆。",
+      "exposure_tier": "tool_efficiency",
+      "environment_tier": "T0"
+    },
+    {
+      "step_id": "A2",
+      "capability_family": "dart_aot_snapshot_analysis",
+      "objective": "在对象池倾倒中查找授权端点与密钥材料",
+      "method": "检查 blutter 输出的 pp.txt 与 objs.txt 中的 URL、密钥样串与授权相关常量",
+      "tool_environment": "blutter 输出 + 文本检索",
+      "time_budget_minutes": 30,
+      "expected_observation": "recovers_target",
+      "failure_meaning": "protection_gap",
+      "applies_to": "both",
+      "notes": "baseline 命中属预期；protected 若仍命中即为防护缺口，须在报告中按 severity 标注。",
+      "exposure_tier": "tool_efficiency",
+      "environment_tier": "T0"
+    },
+    {
+      "step_id": "A3",
+      "capability_family": "runtime_process_observation",
+      "objective": "运行期定位并 hook 授权校验函数",
+      "method": "以 A1 恢复的地址为锚，用 blutter 生成的 blutter_frida.js 模板尝试 hook LicenseValidator.validate 并观察返回值篡改",
+      "tool_environment": "Frida（用户环境自装，许可由用户核验）+ 用户提供的测试设备",
+      "time_budget_minutes": 45,
+      "expected_observation": "error_or_unavailable",
+      "failure_meaning": "unknown",
+      "applies_to": "protected_only",
+      "notes": "hook 失败可能是地址失效、时序或环境问题，不能直接解释为防护成功——只能记 unknown 或记录为成本上升的具体原因。测试台未达 T2 时本步骤记 unknown，不得以跳过记为通过。",
+      "exposure_tier": "runtime_behavior",
+      "environment_tier": "T2",
+      "variant_required": null
+    }
+  ],
+  "success_criteria": {
+    "comparison": "differential_baseline_vs_protected",
+    "interpretation_rule": "cost_delta_only",
+    "budget_rule": "180 分钟预算耗尽后未完成的步骤一律记 unknown；不延长预算，不临时升级工具或追加能力族。"
+  },
+  "evidence": [],
+  "limitations": [
+    "blutter 当前仅支持 Android arm64；其它 ABI 与 iOS 构建未覆盖",
+    "结果依赖 Dart SDK 版本匹配；自定义 Flutter 引擎可能使 A1 直接失败（应记 unknown 而非防护成功）",
+    "限时预算内的结论只说明该预算下的成本差，不能外推为不可攻破",
+    "未覆盖 IL2CPP、自研壳、更高预算的人工分析与动态插桩组合路径"
+  ],
+  "unknowns": [
+    "iOS 构建的同构攻击路径",
+    "更高预算攻击者（数天级）下成本差是否仍然成立"
+  ]
+}

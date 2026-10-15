@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/attack-simulation.schema.json",
+  "title": "PEA Adversarial Attack Simulation Plan",
+  "description": "由能力映射派生的最简沙盒逆向自测方案。合同本身承载红线：产物只读、工具失败不等于防护成功、解释规则只允许成本差或保守失败语义。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "simulation_id", "target_artifacts", "sandbox", "capability_steps", "success_criteria", "limitations"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "simulation_id": {"type": "string", "minLength": 1},
+    "plan_id": {"type": "string", "description": "来源保护计划的 plan_id，供审计追溯。"},
+    "target_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "description": "参与对比的产物。差分对比要求 baseline 与 protected 同时在场。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "enum": ["unprotected_baseline", "protected_candidate"]},
+          "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$", "description": "产物指纹；自测结论必须绑定到这个指纹，不可外推。"}
+        }
+      }
+    },
+    "sandbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["isolation", "read_only_artifacts", "time_budget_minutes", "network"],
+      "properties": {
+        "isolation": {"type": "string", "enum": ["disposable_container", "throwaway_workspace", "dedicated_device"]},
+        "read_only_artifacts": {"type": "boolean", "const": true, "description": "红线：自测绝不修改产物，只允许读取与分析。"},
+        "time_budget_minutes": {"type": "integer", "minimum": 1},
+        "network": {"type": "boolean"},
+        "device": {"type": ["string", "null"], "description": "需要真机步骤时由用户提供测试设备；禁止使用生产设备。"}
+      }
+    },
+    "capability_steps": {
+      "type": "array",
+      "minItems": 1,
+      "description": "每个步骤对应能力映射中的一个能力族的最短攻击路径；不从模型自由发挥。至少一步即可覆盖时不得堆叠。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "capability_family", "objective", "method", "tool_environment", "expected_observation", "failure_meaning", "applies_to"],
+        "properties": {
+          "step_id": {"type": "string", "minLength": 1},
+          "capability_family": {"type": "string", "description": "catalog/rea-capability-defense-map.json 中的 capability_family。"},
+          "objective": {"type": "string", "minLength": 1},
+          "method": {"type": "string", "minLength": 1},
+          "tool_environment": {"type": "string", "minLength": 1, "description": "所需工具与其来源；攻击工具由用户环境自备，PEA 不分发、不自动安装。"},
+          "time_budget_minutes": {"type": ["integer", "null"], "minimum": 1},
+          "expected_observation": {"type": "string", "enum": ["recovers_target", "partial_recovery", "no_recovery", "error_or_unavailable"]},
+          "failure_meaning": {"type": "string", "enum": ["protection_gap", "cost_raised", "unknown"], "description": "红线：工具失败/崩溃/不可用只能记 unknown 或按步骤语义解释，绝不记为防护成功。"},
+          "applies_to": {"type": "string", "enum": ["baseline_only", "protected_only", "both"]},
+          "exposure_tier": {"type": "string", "enum": ["tool_efficiency", "static_content", "runtime_behavior", "algorithm_logic"], "description": "该步骤打击的暴露层；步骤整体按 tool_efficiency > static_content > runtime_behavior > algorithm_logic 由高到低排序（先打一键工具放大的暴露面）。"},
+          "environment_tier": {"type": "string", "enum": ["T0", "T1", "T2", "T3", "T4"], "description": "该步骤执行所需的最低环境层（T0 纯静态 / T1 桌面全权限 / T2 root 模拟器 / T3 root 真机 / T4 硬件级）。环境未达层时该步骤记 unknown，不得记为失败或跳过即通过。"},
+          "variant_required": {"type": ["string", "null"], "description": "步骤所需的源码作弊码变体构建说明（如 detection-disabled fail-safe 变体）；null 或缺失 = 原始构建即可执行。"},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "success_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["comparison", "interpretation_rule"],
+      "properties": {
+        "comparison": {"type": "string", "enum": ["differential_baseline_vs_protected", "absolute_only"]},
+        "interpretation_rule": {"type": "string", "enum": ["cost_delta_only", "tool_failure_is_not_success"], "description": "红线：不允许 absolute_prevention 解释；客户端措施的证据只能是成本差，或保守地把工具失败记为不可判定。"},
+        "budget_rule": {"type": "string", "description": "预算耗尽后的处理规则；默认为记 unknown、不延长、不升级工具。"}
+      }
+    },
+    "evidence": {"type": "array", "items": {"type": "string"}, "description": "执行后回填的证据 ID 列表。"},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "必须非空：任何自测结论必须声明它没覆盖什么。"},
+    "unknowns": {"type": "array", "items": {"type": "string"}}
+  }
+}

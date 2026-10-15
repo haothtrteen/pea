@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.invalid/schemas/tool-effects.schema.json",
+  "title": "PEA MCP Tool Effects",
+  "type": "object",
+  "required": ["name", "version", "capabilities", "side_effects", "permissions", "approval", "resource_limits", "cancellation", "error_codes"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^pea\\.[a-z_]+$"},
+    "version": {"type": "string"},
+    "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "target_requirements": {"type": "array", "items": {"type": "string"}},
+    "side_effects": {"type": "array", "items": {"enum": ["bounded_filesystem_read", "bounded_filesystem_write", "network_read", "network_write", "spawn_process", "ui_interaction", "approval_state_write", "none"]}, "uniqueItems": true},
+    "permissions": {"type": "array", "items": {"type": "string"}},
+    "approval": {"enum": ["none", "workspace_scope_confirmation", "network_policy_if_online", "explicit_user_confirmation", "valid_scoped_one_time_token", "test_command_preview_required", "output_path_and_overwrite_confirmation", "artifact_scope_confirmation"]},
+    "resource_limits": {"type": "object", "required": ["timeout_seconds", "max_output_bytes"], "properties": {"timeout_seconds": {"type": "integer", "minimum": 1}, "max_output_bytes": {"type": "integer", "minimum": 1}, "max_memory_mb": {"type": ["integer", "null"], "minimum": 1}, "max_cpu_seconds": {"type": ["integer", "null"], "minimum": 1}}, "additionalProperties": false},
+    "cancellation": {"type": "string"},
+    "error_codes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "idempotent": {"type": "boolean"},
+    "network_hosts": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

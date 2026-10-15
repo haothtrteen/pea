@@ -1,0 +1,42 @@
+{
+  "generated_by": "scripts/build_canary_artifacts.py",
+  "note": "Synthetic form-canaries: ELF headers and planted strings are real bytes, but these are NOT Flutter builds (no Flutter SDK in this environment). Dart AOT recovery-rate claims stay unknown until a real build exists.",
+  "artifacts": [
+    {
+      "path": "build/app/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libapp.so",
+      "kind": "flutter_dart_snapshot",
+      "sha256": "edbe1e1baebbc652df3e54013c09c0cc11e00452b6d8a09a817fbccb3aa53352",
+      "bytes": 632
+    },
+    {
+      "path": "build/app/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libapp.so",
+      "kind": "flutter_dart_snapshot",
+      "sha256": "c240c0f29faf211168ca89ffd71ed05177ad71e506c196938188aea951ebd7a4",
+      "bytes": 420
+    },
+    {
+      "path": "build/app/intermediates/merged_native_libs/release/out/lib/x86_64/libapp.so",
+      "kind": "flutter_dart_snapshot",
+      "sha256": "7b34b1e4f7aaee23933fe01d24ba0fd59243f3d08477361a3e3d1345df9e17ab",
+      "bytes": 632
+    },
+    {
+      "path": "build/app/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libflutter.so",
+      "kind": "flutter_engine",
+      "sha256": "c80afdf809b77a20f7936ceeda94bdbf49a456c01040f4310cb2e706b449e3b8",
+      "bytes": 366
+    },
+    {
+      "path": "build/app/outputs/flutter-apk/app-release.apk",
+      "kind": "android_package",
+      "sha256": "a2d1a7d933bf4071cc496325ceb22797a3418faef4b53309ddedde74d0d8df44",
+      "bytes": 687
+    },
+    {
+      "path": "build/app/outputs/bundle/release/app-release.aab",
+      "kind": "android_app_bundle",
+      "sha256": "12bd720b4e1a2d732d25fd5531a80ae0199ca569e1b98c87be1de830218419a4",
+      "bytes": 509
+    }
+  ]
+}

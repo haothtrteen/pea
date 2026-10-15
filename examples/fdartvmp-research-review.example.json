@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "fdartvmp",
+  "source_url": "https://github.com/haothtrteen/FDartVMP",
+  "reviewed_at": "2026-10-13",
+  "commit_sha": null,
+  "release_or_tag": null,
+  "review_state": "documentation_reviewed",
+  "source_audit": {
+    "status": "failed_to_fetch",
+    "notes": "执行环境无法解析 github.com；尚未 clone，因此没有源码路径结论。",
+    "reviewed_paths": [],
+    "source_digest": null
+  },
+  "license_review": {
+    "reported_license": "AGPL-3.0-or-later OR commercial (per LICENSING.md)",
+    "status": "needs_legal_review",
+    "notes": "闭源分发和项目级兼容性需另审；VMPacker 声明为独立工具/许可证。",
+    "third_party_dependencies_reviewed": false
+  },
+  "fixture_test": {
+    "status": "not_run",
+    "test_scope": "none",
+    "command_or_test_ref": null,
+    "notes": "未在本环境复现 README 所述的测试命令。"
+  },
+  "claims": [
+    {
+      "claim": "项目将被选定的 Dart 函数转换为私有指令，并由 native interpreter 执行。",
+      "claim_status": "external_claim",
+      "evidence_url": "https://github.com/haothtrteen/FDartVMP",
+      "path_and_lines": null,
+      "limitations": [
+        "只反映公开 README 的描述；尚未源码复核或独立复现。"
+      ]
+    },
+    {
+      "claim": "公开文档承认 native interpreter 与 Dart 堆/返回值仍可被分析。",
+      "claim_status": "external_claim",
+      "evidence_url": "https://github.com/haothtrteen/FDartVMP",
+      "path_and_lines": null,
+      "limitations": [
+        "公开网页阅读；未固定 commit。"
+      ]
+    }
+  ],
+  "limitations": [
+    "本地源码未下载/审计",
+    "项目测试与设备适配未复现",
+    "具体商业许可条款和第三方组件均待审核"
+  ],
+  "decision": "research_only",
+  "reviewer_notes": "只用作 VMP 工程方法研究参考，不进入自动执行或打包依赖。"
+}

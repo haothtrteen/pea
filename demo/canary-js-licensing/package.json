@@ -1,0 +1,9 @@
+{
+  "name": "pea-canary-js-licensing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PEA protection-pipeline canary (WP4): a measurement vehicle, not a security implementation.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

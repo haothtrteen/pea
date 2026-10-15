@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.invalid/schemas/exposure-finding.schema.json",
+  "title": "PEA Exposure Finding",
+  "type": "object",
+  "required": ["id", "category", "status", "severity", "evidence", "coverage", "limitations"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "category": {"type": "string", "minLength": 1},
+    "status": {"enum": ["observed", "inferred", "unknown", "not_applicable"]},
+    "severity": {"enum": ["info", "low", "medium", "high", "critical", "unrated"]},
+    "title": {"type": "string"},
+    "summary": {"type": "string"},
+    "artifact_digest": {"type": ["string", "null"]},
+    "artifact_path": {"type": ["string", "null"]},
+    "location": {"type": ["object", "null"]},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "exposure_tier": {"type": "string", "enum": ["tool_efficiency", "static_content", "runtime_behavior", "algorithm_logic"], "description": "暴露分层：修复顺序由高到低为 tool_efficiency > static_content > runtime_behavior > algorithm_logic（按攻击者边际成本排序）。上下文类发现（如 project_profile）无此字段。"},
+    "evidence": {"type": "array", "items": {"$ref": "evidence-record.schema.json"}},
+    "coverage": {"type": "object", "properties": {"state": {"enum": ["complete_for_scope", "partial", "unavailable", "not_run"]}, "scope": {"type": "string"}, "omissions": {"type": "array", "items": {"type": "string"}}}, "required": ["state", "scope"]},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "recommended_actions": {"type": "array", "items": {"type": "string"}},
+    "secret_value_redacted": {"type": "boolean", "default": true}
+  },
+  "additionalProperties": false
+}

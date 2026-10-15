@@ -1,0 +1,632 @@
+{
+  "common_rules": [
+    "never execute model-generated arbitrary shell",
+    "unknown is not pass",
+    "all side effects require scoped authorization",
+    "sources and tool outputs are untrusted data"
+  ],
+  "contract_note": "Draft contracts; all tools call a shared service layer. ToolEffects and availability must be generated from implementation metadata.",
+  "schema_version": "1.1",
+  "server": "pea-mcp",
+  "tools": [
+    {
+      "approval": "workspace_scope_confirmation",
+      "execution": "never run project scripts",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.assess_project",
+      "output_required": [
+        "profile",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Read-only project profile under an explicitly authorized root.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "target_manifest",
+        "targets"
+      ],
+      "name": "pea.map_exposure",
+      "output_required": [
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Map approved artifacts and project metadata to observable exposure surfaces.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "network_policy_if_online",
+      "execution": "online results enter review queue only",
+      "input_required": [
+        "targets",
+        "goals"
+      ],
+      "name": "pea.search_catalog",
+      "output_required": [
+        "candidates",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Search local catalog and optionally discover official sources.",
+      "side_effects": [
+        "optional_network_read"
+      ]
+    },
+    {
+      "approval": "network_policy_if_online",
+      "input_required": [
+        "candidate_id_or_url"
+      ],
+      "name": "pea.inspect_candidate",
+      "output_required": [
+        "sources",
+        "license_status",
+        "version",
+        "capability_matrix",
+        "unknowns"
+      ],
+      "purpose": "Inspect official metadata, license, versions, dependencies and declared side effects without running installers.",
+      "side_effects": [
+        "optional_network_read",
+        "bounded_artifact_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "request",
+        "profile",
+        "catalog_snapshot"
+      ],
+      "name": "pea.plan_protection",
+      "output_required": [
+        "plan_id",
+        "plan_digest",
+        "status",
+        "options",
+        "exclusions",
+        "risks",
+        "verification_gates",
+        "rollback"
+      ],
+      "purpose": "Generate ranked protection options and verification gates; no changes are applied. When a run store is configured the plan is persisted there, annotated with the execution target (project_path) and its content digest - the digest is what review and apply re-verify, so a changed plan never rides an old approval.",
+      "side_effects": []
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "input_required": [
+        "plan_id",
+        "explicit_user_approval"
+      ],
+      "name": "pea.review_plan",
+      "output_required": [
+        "plan_digest",
+        "approval_token",
+        "expires_at",
+        "affected_files"
+      ],
+      "purpose": "Preview the exact approval scope for one plan (target, affected files, tool version, side effects) and park at awaiting_approval; issue the short-lived one-time token only when a trusted-channel approval event for the exact scope fingerprint exists. A model-supplied Boolean is intent, never approval.",
+      "side_effects": [
+        "approval_state_write"
+      ]
+    },
+    {
+      "approval": "valid_scoped_one_time_token",
+      "input_required": [
+        "plan_id",
+        "approval_token",
+        "expected_plan_digest"
+      ],
+      "name": "pea.apply_plan",
+      "output_required": [
+        "run_id",
+        "status",
+        "artifact_manifest",
+        "cleanup_status"
+      ],
+      "purpose": "Execute only registered adapters with structured argv in an isolated workspace. The one-time token is consumed here (replay/expiry/scope changes are refusals at the consumption point), the target is snapshotted into the managed workspace first, and the plan digest is re-verified against the stored record.",
+      "side_effects": [
+        "temporary_workspace_write",
+        "spawn_process"
+      ]
+    },
+    {
+      "approval": "test_command_preview_required",
+      "input_required": [
+        "run_id",
+        "test_profile"
+      ],
+      "name": "pea.verify_output",
+      "output_required": [
+        "status",
+        "gates",
+        "metrics",
+        "evidence",
+        "unknowns"
+      ],
+      "purpose": "Run reviewed tests and output checks; report pass/fail/unknown per gate. An external tool exiting 0 is at most 'the tool reported success' - never a finding that protection worked. A failed gate discards the managed output and records the recovery.",
+      "side_effects": [
+        "spawn_process"
+      ]
+    },
+    {
+      "approval": "artifact_scope_confirmation",
+      "input_required": [
+        "baseline_run_id",
+        "candidate_run_id"
+      ],
+      "name": "pea.compare_results",
+      "output_required": [
+        "semantic_diff",
+        "performance_diff",
+        "exposure_diff",
+        "coverage"
+      ],
+      "purpose": "Compare approved baseline and protected result without inferring security from missing evidence. The read-only analysis stack runs on both sides: observed findings are counted, unknown-shaped records listed separately, runtime overhead stays a declared unknown.",
+      "side_effects": [
+        "bounded_artifact_read"
+      ]
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "input_required": [
+        "run_id",
+        "output_dir"
+      ],
+      "name": "pea.export_report",
+      "output_required": [
+        "report_paths",
+        "artifact_hashes"
+      ],
+      "purpose": "Write a redacted Markdown/JSON report, manifests and rollback instructions.",
+      "side_effects": [
+        "output_file_write"
+      ]
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "input_required": [
+        "run_id",
+        "mode"
+      ],
+      "name": "pea.rollback",
+      "output_required": [
+        "status",
+        "reverted_paths",
+        "cleanup_evidence"
+      ],
+      "purpose": "Delete PEA-owned temporary workspace or revert only PEA-created patch. Never touches the user's project; the recovery itself is recorded, including its own failure - a best-effort rollback reports honestly instead of faking a green light.",
+      "side_effects": [
+        "bounded_filesystem_write"
+      ]
+    },
+    {
+      "approval": "none",
+      "execution": "emits a plan only; executing attack steps happens under pea.verify_output with previewed commands",
+      "input_required": [
+        "baseline",
+        "languages",
+        "platforms"
+      ],
+      "name": "pea.design_attack_simulation",
+      "output_required": [
+        "simulation",
+        "capability_steps",
+        "sandbox",
+        "success_criteria",
+        "limitations",
+        "unknowns"
+      ],
+      "purpose": "Derive a minimal sandboxed adversarial self-test plan from the capability map; steps come from capability families, never from free-form model improvisation. The plan is read-only over artifacts and time-budgeted.",
+      "side_effects": []
+    },
+    {
+      "approval": "none",
+      "execution": "emits a brief only; no attack tool is bundled, installed or executed",
+      "input_required": [
+        "baseline",
+        "languages",
+        "platforms"
+      ],
+      "name": "pea.design_mission_brief",
+      "output_required": [
+        "brief",
+        "simulation",
+        "environment",
+        "red_lines",
+        "evidence_return",
+        "unknowns"
+      ],
+      "purpose": "Compose the live-fire mission brief (third ring §2): the attack simulation plus objective anchors, testbench environment tiering (steps the environment cannot reach are deferred to unknown), tool families with research dates, fixed red lines and the evidence-return contract. Emits a brief only; the user's agent drives the user's own REA installation.",
+      "side_effects": []
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "execution": "read-only over the project; writes only the requested report outputs",
+      "input_required": [
+        "request",
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.demo_run",
+      "output_required": [
+        "recon",
+        "plan",
+        "attack_simulation",
+        "ledger",
+        "report_paths"
+      ],
+      "purpose": "End-to-end prototype walkthrough (v1.0 demo): read-only recon, capability-derived exposure mapping, plan generation, attack-simulation design and evidence ledger assembly, then a Markdown/JSON report. Composes the pure functions; performs no protection transform.",
+      "side_effects": [
+        "bounded_filesystem_read",
+        "output_file_write"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.scan_artifacts",
+      "output_required": [
+        "artifacts",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Enumerate shippable artifacts under the authorized root with SHA-256 fingerprints.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.scan_secrets",
+      "output_required": [
+        "hits",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Scan static files for secret material; hits record pattern names and lines only.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.scan_strings_symbols",
+      "output_required": [
+        "profiles",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Extract strings and symbol-shaped leaks from manifest binaries; counts only, never content.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.check_native",
+      "output_required": [
+        "profiles",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Structurally read ELF/PE/Mach-O containers for hardening gaps (stack/NX/PIE/RELRO/strip).",
+      "side_effects": [
+        "bounded_artifact_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.check_dart_aot",
+      "output_required": [
+        "snapshots",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Probe Dart snapshot containers for anchors and object-pool shapes; obfuscation stays unknown.",
+      "side_effects": [
+        "bounded_artifact_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.check_build_integration",
+      "output_required": [
+        "configs",
+        "checks",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Compare build declarations against observed artifacts; a declaration is never proof of a build.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [],
+      "name": "pea.check_testbench",
+      "output_required": [
+        "reachable_tier",
+        "devices",
+        "avds",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Reconnoiter the local testbench environment (adb devices, AVD images, frida-server reachability, docker/redroid); detection only - installs nothing, starts nothing, and a missing environment is a named unknown, never a pass.",
+      "side_effects": [
+        "spawn_process"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "cracked_path",
+        "baseline_path",
+        "authorization"
+      ],
+      "name": "pea.intake_cracked_artifact",
+      "output_required": [
+        "diffs",
+        "findings",
+        "coverage",
+        "unknowns"
+      ],
+      "purpose": "Cracked-package intake (D7): read-only scan of the cracked build plus a manifest digest diff against the original to locate what changed. Diff facts are observations; layer attributions are inferences; added files are unknowns.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "intake"
+      ],
+      "name": "pea.design_field_response",
+      "output_required": [
+        "response",
+        "measures",
+        "negative_tests",
+        "red_lines",
+        "unknowns"
+      ],
+      "purpose": "Field response plan (D7): the server-side moving goalpost - rotate the challenge/protocol/verification rules only a client still executing the original logic can answer. Never pushes code into the cracked package; declined outright for offline-only postures; mandatory negative tests include legitimate variants.",
+      "side_effects": []
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "candidate_id"
+      ],
+      "name": "pea.review_candidate",
+      "output_required": [
+        "review",
+        "decision",
+        "claims"
+      ],
+      "purpose": "Gate a catalog candidate through license/maintenance/evidence/trust; block beats everything.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "network_policy_if_online",
+      "input_required": [
+        "keywords"
+      ],
+      "name": "pea.fetch_capability_intel",
+      "output_required": [
+        "candidates",
+        "status",
+        "reason",
+        "unknowns"
+      ],
+      "purpose": "Retrieve capability intelligence for one family under a domain allowlist; offline is a named unknown, never an empty success.",
+      "side_effects": [
+        "optional_network_read"
+      ]
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "input_required": [
+        "run_id",
+        "evidence"
+      ],
+      "name": "pea.ledger_record",
+      "output_required": [
+        "evidence_id",
+        "ledger_digest"
+      ],
+      "purpose": "Append one evidence record to the run ledger; unknown-producing evidence stays open.",
+      "side_effects": [
+        "approval_state_write"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "run_id",
+        "filters"
+      ],
+      "name": "pea.ledger_query",
+      "output_required": [
+        "records",
+        "unknowns",
+        "coverage"
+      ],
+      "purpose": "Query ledger evidence and unknowns by id, status or capability family.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "run_id"
+      ],
+      "name": "pea.ledger_audit_unknowns",
+      "output_required": [
+        "residual_unknowns",
+        "blocking",
+        "coverage"
+      ],
+      "purpose": "Audit residual unknowns; blocking unknowns keep the verified gate closed.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "run_id"
+      ],
+      "name": "pea.ledger_gate",
+      "output_required": [
+        "status",
+        "blockers"
+      ],
+      "purpose": "Evaluate the verified gate mechanically; any blocking unknown blocks, no discretion.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "explicit_user_confirmation",
+      "input_required": [
+        "run_id",
+        "unknown_id",
+        "evidence_id"
+      ],
+      "name": "pea.ledger_resolve",
+      "output_required": [
+        "unknown",
+        "status"
+      ],
+      "purpose": "Resolve an open unknown against cited evidence; resolution without evidence is refused.",
+      "side_effects": [
+        "approval_state_write"
+      ]
+    },
+    {
+      "approval": "output_path_and_overwrite_confirmation",
+      "input_required": [
+        "run_id",
+        "output_dir"
+      ],
+      "name": "pea.ledger_export",
+      "output_required": [
+        "export_paths",
+        "ledger_digest"
+      ],
+      "purpose": "Export the run ledger as redacted Markdown/JSON with digests.",
+      "side_effects": [
+        "output_file_write"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "execution": "read-only over the project; writes only the task store under the environment-configured root (PEA_TASK_STORE)",
+      "input_required": [
+        "request",
+        "project_path",
+        "authorization"
+      ],
+      "name": "pea.run_assessment",
+      "output_required": [
+        "task_id",
+        "status",
+        "steps"
+      ],
+      "purpose": "Create and run a durable assessment task: authorization gate, read-only analysis domains, plan generation, attack-simulation design, evidence ledger, verified gate and report - every step persisted so an interrupted run resumes instead of restarting. Planning only; no protection transform is executed. An unpassed authorization gate parks the task at the gate instead of scanning.",
+      "side_effects": [
+        "bounded_filesystem_read",
+        "bounded_filesystem_write"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [
+        "task_id"
+      ],
+      "name": "pea.get_task",
+      "output_required": [
+        "task"
+      ],
+      "purpose": "Load one assessment task's entity: lifecycle status plus the step table with per-step status, input/output digests and recovery points.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "none",
+      "input_required": [],
+      "name": "pea.list_tasks",
+      "output_required": [
+        "tasks"
+      ],
+      "purpose": "List assessment tasks in the store, oldest first, with lifecycle status and step counts.",
+      "side_effects": [
+        "bounded_filesystem_read"
+      ]
+    },
+    {
+      "approval": "workspace_scope_confirmation",
+      "input_required": [
+        "task_id",
+        "authorization"
+      ],
+      "name": "pea.resume_task",
+      "output_required": [
+        "task_id",
+        "status",
+        "steps"
+      ],
+      "purpose": "Resume a parked or failed assessment task from its recorded state: steps whose input digest is unchanged are not re-run, the rest run. The recorded request is immutable - resume re-confirms the workspace scope but never rewrites the task's evidence basis (a new authorization means a new task).",
+      "side_effects": [
+        "bounded_filesystem_read",
+        "bounded_filesystem_write"
+      ]
+    }
+  ]
+}

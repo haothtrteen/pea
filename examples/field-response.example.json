@@ -1,0 +1,61 @@
+{
+  "created_at": "2026-10-14T00:00:00+00:00",
+  "incident": {
+    "baseline_path": "samples/original/app-release",
+    "changed_artifacts": 2,
+    "changed_paths": [
+      "lib/arm64-v8a/libapp.so",
+      "lib/arm64-v8a/libpatch.so"
+    ],
+    "cracked_path": "samples/cracked/app-cracked"
+  },
+  "limitations": [
+    "diff 只覆盖 manifest 枚举到的产物；未枚举路径（构建输出目录之外）的改动不可见",
+    "哪条防护失效是推断：改动位置与暴露层的对应关系需人工确认，不得把推断当作实测",
+    "响应措施改变服务端契约；灰度与回滚计划由部署方掌握，PEA 不执行"
+  ],
+  "measures": [
+    {
+      "impact_scope": "所有仍与旧规则通信的客户端；合法客户端随版本更新获得新规则",
+      "kind": "server_side_goalpost_move",
+      "measure_id": "M1",
+      "rationale": "破解包改动了 lib/arm64-v8a/libapp.so（digest 变化）；轮换该产物承载逻辑对应的服务端挑战/校验规则——破解者剥掉了什么，就轮换什么，他剥掉的正是他答不上的",
+      "rollout": "gray",
+      "target": "license_challenge_rotation_v1",
+      "trigger_artifact": "lib/arm64-v8a/libapp.so"
+    }
+  ],
+  "negative_tests": [
+    {
+      "expectation": "破解变体（diff 定位的改动产物）在新规则下无法完成服务端挑战应答",
+      "scenario": "cracked_variant_fails",
+      "test_id": "NT-cracked-fails"
+    },
+    {
+      "expectation": "未改动的合法客户端在新规则下行为不变（历史 kill-switch 误杀是真实事故教训）",
+      "scenario": "legitimate_variant_unaffected",
+      "test_id": "NT-legitimate-unaffected"
+    },
+    {
+      "expectation": "离线客户端降级路径可用（本地宽限期与提示），不硬失败",
+      "scenario": "offline_client_degrades_gracefully",
+      "test_id": "NT-offline-graceful"
+    }
+  ],
+  "posture": "server_side_available",
+  "red_lines": [
+    "中性失效：服务器不再配合破解包；不触碰攻击者设备（敌对载荷是法律雷区）",
+    "不误杀合法用户：负向测试必须包含'合法变体不受影响'，通过后才可全量",
+    "不往已分发的破解包推送代码：剥掉加载路径则更新进不去，没剥掉则更新成为送上门的分析材料",
+    "仅对有服务端姿态可用；纯离线应用在计划推导时挡掉本机制",
+    "响应是服务端动作：轮换挑战/协议/校验规则，不修改、不回写、不重新打包任何已分发产物"
+  ],
+  "response_id": "fr-crackintake-demo-0001",
+  "schema_version": "1.0",
+  "unknowns": [
+    "破解包新增文件 lib/arm64-v8a/libpatch.so：内容与用途未分析，不得假定为恶意载荷",
+    "改动产物是否重新签名、是否含额外通信端点，未分析",
+    "合法用户中是否存在误装变体，未评估",
+    "破解包新增 1 个文件（内容未分析）：若其中含服务端通信补丁，需先分析再决定是否收紧 attestation"
+  ]
+}

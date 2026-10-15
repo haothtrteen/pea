@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "target": "demo-app-release",
+  "artifact_digest": "sha256:example-only-not-a-real-digest",
+  "findings": [
+    {
+      "id": "F-001",
+      "category": "possible_embedded_secret",
+      "status": "inferred",
+      "severity": "high",
+      "title": "疑似客户端凭据常量",
+      "summary": "匹配到疑似凭据格式；内容已脱敏，需人工确认是否为真实秘密。",
+      "artifact_digest": "sha256:example-only-not-a-real-digest",
+      "artifact_path": "assets/app.bundle.js",
+      "location": {
+        "line": 1,
+        "column": 2084
+      },
+      "confidence": 0.63,
+      "evidence": [
+        {
+          "evidence_id": "E-001",
+          "kind": "file_observation",
+          "source": "artifact scan fixture",
+          "observed_at": "2026-10-13T00:00:00Z",
+          "tool_name": "pea-demo-scanner",
+          "tool_version": "0.1.0",
+          "commit_or_release": null,
+          "artifact_digest": "sha256:example-only-not-a-real-digest",
+          "location": "assets/app.bundle.js:1:2084",
+          "authority": "observation",
+          "coverage_state": "complete_for_scope",
+          "limitations": [
+            "正则/启发式命中不证明该字符串具备权限。"
+          ],
+          "content_digest": null,
+          "redacted_summary": "credential-shaped token [REDACTED]"
+        }
+      ],
+      "coverage": {
+        "state": "complete_for_scope",
+        "scope": "解包后的 JS bundle 文件",
+        "omissions": []
+      },
+      "limitations": [
+        "需要凭据所有者确认并检查服务端是否仍接受该凭据。"
+      ],
+      "recommended_actions": [
+        "若属真实凭据，立即按受控流程轮换/吊销；避免仅靠混淆隐藏。"
+      ],
+      "secret_value_redacted": true,
+      "exposure_tier": "static_content"
+    }
+  ]
+}

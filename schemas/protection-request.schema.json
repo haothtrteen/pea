@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/protection-request.schema.json",
+  "title": "PEA Protection Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_path", "authorization", "targets", "goals", "offline_required", "execution_mode"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "project_path": {"type": "string", "minLength": 1},
+    "authorization": {"type": "string", "enum": ["owner", "written_authorization", "not_confirmed"]},
+    "targets": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "languages": {"type": "array", "items": {"type": "string"}},
+    "goals": {"type": "array", "items": {"type": "string", "enum": ["obfuscation", "tamper_detection", "logic_extraction", "licensing_hardening", "resource_protection", "function_virtualization"]}, "minItems": 1},
+    "protected_symbols": {"type": "array", "items": {"type": "string"}},
+    "threat_model": {"type": "string", "enum": ["casual_static_analysis", "competent_reverse_engineer", "runtime_control", "mixed", "unspecified"]},
+    "offline_required": {"type": "boolean"},
+    "performance_budget_percent": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "allowed_spdx_licenses": {"type": "array", "items": {"type": "string"}},
+    "execution_mode": {"type": "string", "enum": ["plan_only", "apply_after_approval"]},
+    "allow_network": {"type": "boolean", "default": false},
+    "distribution": {
+      "type": "string",
+      "enum": ["internal_controlled", "internal_uncontrolled", "external_limited", "mass_offline", "saas"],
+      "description": "软件如何分发、给谁用。决定可信边界强度；缺省时规划器按 insufficient_information 处理。"
+    },
+    "audience": {
+      "type": "string",
+      "enum": ["self", "team", "partners", "public"],
+      "description": "最终使用对象。影响环境校验类措施对合法使用的误伤成本。"
+    },
+    "device_control": {
+      "type": "string",
+      "enum": ["managed_devices", "known_devices", "unknown_devices", "attacker_controlled"],
+      "description": "运行设备受控程度。attacker_controlled 下任何本地检测都只是成本信号，不能作为信任根。"
+    },
+    "update_channel": {
+      "type": "string",
+      "enum": ["none", "signed_updates", "app_store", "server_controlled"],
+      "description": "可信更新通道。签名与可信更新的优先级高于本地完整性检测。"
+    },
+    "secret_can_leave_client": {
+      "type": "string",
+      "enum": ["yes", "no", "unknown"],
+      "description": "高价值逻辑能否移出客户端。能移出的秘密不应留在客户端。"
+    },
+    "cross_platform_requirements": {"type": "string"},
+    "assets": {"type": "string"},
+    "test_baseline": {"type": "string", "enum": ["full", "partial", "none"]},
+    "notes": {"type": "string"}
+  }
+}

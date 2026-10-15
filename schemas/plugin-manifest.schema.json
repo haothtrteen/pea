@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/plugin-manifest.schema.json",
+  "title": "PEA Adapter Plugin Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "version", "license", "source_url", "capabilities", "permissions", "targets", "inputs", "outputs", "limits", "network_hosts", "test_command", "rollback_supported"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,79}$"},
+    "version": {"type": "string"},
+    "author": {"type": "string"},
+    "license": {"type": "string"},
+    "source_url": {"type": "string", "format": "uri"},
+    "artifact_sha256": {"type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$"},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "permissions": {"type": "array", "items": {"type": "string", "enum": ["read_project", "write_workspace", "spawn_process", "network_read", "network_write", "system_key_store"]}},
+    "targets": {"type": "array", "items": {"type": "string"}},
+    "inputs": {"type": "array", "items": {"type": "string"}},
+    "outputs": {"type": "array", "items": {"type": "string"}},
+    "limits": {"type": "object", "required": ["timeout_seconds", "memory_mb", "output_mb"], "properties": {"timeout_seconds": {"type": "integer", "minimum": 1}, "memory_mb": {"type": "integer", "minimum": 64}, "output_mb": {"type": "integer", "minimum": 1}}},
+    "network_hosts": {"type": "array", "items": {"type": "string"}},
+    "test_command": {"type": "array", "items": {"type": "string"}},
+    "rollback_supported": {"type": "boolean"}
+  }
+}

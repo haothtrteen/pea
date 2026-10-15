@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "project_path": "./examples/internal-android-app",
+  "authorization": "owner",
+  "targets": ["android-arm64"],
+  "languages": ["kotlin 2.0"],
+  "goals": ["tamper_detection", "obfuscation", "licensing_hardening"],
+  "protected_symbols": ["computeLicenseTier"],
+  "threat_model": "competent_reverse_engineer",
+  "offline_required": true,
+  "performance_budget_percent": 8,
+  "allowed_spdx_licenses": ["BSD-2-Clause", "MIT", "Apache-2.0"],
+  "execution_mode": "plan_only",
+  "allow_network": false,
+  "distribution": "internal_controlled",
+  "audience": "team",
+  "device_control": "managed_devices",
+  "update_channel": "signed_updates",
+  "secret_can_leave_client": "no",
+  "assets": "授权决策算法 computeLicenseTier；客户端不含长期服务端密钥",
+  "test_baseline": "partial",
+  "notes": "内部团队自用、设备受 MDM 管控。用户提出「要绝对安全，想堆环境校验和密钥授权」；intake 据此推导为 controlled_environment_hardening——环境校验允许但默认不开启、需显式批准，且明确记录客户端校验只能提高分析成本、不构成绝对保证。"
+}

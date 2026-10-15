@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pea.example/schemas/protection-plan.schema.json",
+  "title": "PEA Protection Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "request_id",
+    "status",
+    "strategy",
+    "selected_catalog_ids",
+    "steps",
+    "risks",
+    "verification_gates",
+    "side_effects"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "needs_user_review",
+        "blocked",
+        "approved",
+        "executed",
+        "verified",
+        "failed"
+      ]
+    },
+    "strategy": {
+      "type": "string",
+      "enum": [
+        "existing_tool",
+        "logic_extraction",
+        "restricted_ir_vm",
+        "platform_native",
+        "no_safe_match"
+      ]
+    },
+    "selected_catalog_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification_gates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approval_token": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rollback": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "candidate_scores": {
+      "type": "array",
+      "description": "通过硬门控的候选及其得分。score 只在 basis 列出的轴上加权归一化，未列入的轴表示目录中无信号（performance 恒不在内）。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "score"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "basis": {
+            "type": "array",
+            "description": "实际参与打分的轴名，见 src/pea/planner.py 的 SCORE_WEIGHTS。",
+            "items": {
+              "type": "string",
+              "enum": [
+                "capability_fit",
+                "platform_fit",
+                "maintenance",
+                "license",
+                "build_integration",
+                "performance",
+                "provenance"
+              ]
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "excluded_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "deployment_posture": {
+      "type": "string",
+      "description": "intake 推导出的部署姿态。"
+    },
+    "posture_rationale": {"type": "string"},
+    "posture_confidence": {"type": "string", "enum": ["high", "medium", "low", "unknown"]},
+    "intake_assumptions": {"type": "array", "items": {"type": "string"}},
+    "intake_unknowns": {"type": "array", "items": {"type": "string"}},
+    "client_side_hardening": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "requires_explicit_approval"],
+      "properties": {
+        "allowed": {"type": "boolean"},
+        "requires_explicit_approval": {"type": "boolean"}
+      }
+    },
+    "project_path": {
+      "type": "string",
+      "description": "执行循环批准的目标项目路径（WP3 由 plan_protection 记录）。它是计划内容的一部分：换目标即换 digest，旧审批不覆盖新目标。"
+    },
+    "plan_digest": {
+      "type": "string",
+      "description": "计划内容 digest（不含本字段自身，见 src/pea/protect.py 的 plan_digest）。review/apply 以重算值比对，计划任何变化即拒绝。"
+    }
+  }
+}
